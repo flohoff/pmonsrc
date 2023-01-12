@@ -1,0 +1,2 @@
+
+-O -DPMCC -DLR33050 -DLR33000 -DALGSDE -nostdinc -I../include -DLANGUAGE_C -c onintr.c

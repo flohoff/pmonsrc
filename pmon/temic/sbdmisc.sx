@@ -1,0 +1,50 @@
+/*
+ * TEMIC/sbdmisc.S: low level board support for Algor/Temic module
+ * Copyright (c) 1999 Algorithmics Ltd.
+ */
+
+#include <mips/asm.h>
+#include <mips/regdef.h>
+#include <mips/cpu.h>
+
+#include "sbd.h"
+	
+	.lcomm	_wbfltmp,4
+
+/*
+ * Flush write buffer
+ */
+LEAF(mips_wbflush)
+	/* uncached read forces write buffer flush */
+	la	t0,_wbfltmp
+	or	t0,KSEG1_BASE
+	sync
+	lw	t0,0(t0)
+	addu	t0,1
+	j	ra
+END(mips_wbflush)
+
+
+/*
+ * compiler independent delay loop executes exactly 4 + 2*n instructions
+ * mips_cycle(unsigned n)
+ */
+LEAF(mips_cycle)
+	.set	noreorder
+1:	bnez	a0,1b
+	addiu	a0,-1		/* BDSLOT */
+	.set	reorder
+	j	ra
+END(mips_cycle)
+
+	
+LEAF(_sbd_gettod)
+	move	v0,zero
+	j	ra
+END(_sbd_gettod)
+	
+	
+LEAF(_sbd_settod)
+	j	ra
+END(_sbd_settod)
+

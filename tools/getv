@@ -1,0 +1,6 @@
+# $Id: getv,v 1.2 1996/01/16 14:25:29 chris Exp $
+#!/bin/csh -f
+#
+# Output current PMON version number
+#
+echo 2.7.2

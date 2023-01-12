@@ -1,0 +1,27 @@
+# $Id: makefile.dos,v 1.2 1996/01/16 14:17:01 chris Exp $ 
+include files.mk
+include $(LSIPKG)/defines.mk
+
+CFLAGS = -O
+CC = pmcc
+
+.s.o:
+	$(CC) -c $<
+
+.c:
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< -lm
+
+PROGS =	$(CFILES:.c=)
+
+all :
+
+clean :
+	rm -f $(PROGS) *.rec *.o files.coff a.out files.c
+
+tape :
+	@for i in $(CFILES) $(ASFILES) $(OTHERS) ; do \
+		echo $(DIR)/$$i ; \
+	done
+
+revision :
+	@putv $(REV) $(CFILES) $(ASFILES) $(OTHERS)

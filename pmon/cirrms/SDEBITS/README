@@ -1,0 +1,29 @@
+
+1) Copy the two files CIRRMS.sx and CIRRMS_C.c to the directory /usr/local/sde/kit.
+   Also copy the file m82510.h from the directory above (..).
+
+2) Edit the file /usr/local/sde/examples/make.inc, and add the following 
+   three lines at the beginning:
+
+SBD		=CIRRMS
+RAMDOWNLOAD	=lsi
+DLSYMS		=-y
+
+3) Try building and downloading a few examples, e.g. ex1, ex2 and ex3.
+   The makefiles will build ex?ram.lsi, which you can download to the board.
+   See section 7 of the SDE manual and the PMON manual for mode info.
+
+4) To create a new program (e.g. a diagnostic or benchmark).  
+   a) Read the SDE manual!!  
+   b) Create a new directory in /sde/examples (e.g. /sde/examples/diag).
+   c) Copy the Makefile from a "similar" examples, e.g.
+         ex1 - for really noddy programs
+         ex2 - for programs which need to handle exceptions and/or interrupts
+         ex5 - for integer benchmarks
+	 ex6 - for floating point benchmarks
+   d) Edit the makefile and put the name of your source file(s)
+      after OBJS=  (changing .c to .o), e.g.
+   	OBJS	=diag.o
+   e) Change PROG= to the name of your program.
+   f) Make it: you should get a downloadable file diagram.lsi which can be
+      downloaded to the board, and diagrom.s3 which can be blown into ROM.

@@ -1,0 +1,3533 @@
+Fri Nov 16 13:01:08 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Added R5500 self-reset support.  Always
+	disable extra CAS cycle.  Recognise and enable registered DIMMs.
+
+	* pmon/p6032/sbdfreq.c: Use R5500 multiplier ratios.
+
+	* pmon/p6032/sbd.h (PIO_REGENABLE): P6064 registered DRAM enable bit
+
+	* pmon/p6032/sbd.c (sbdmachinfo): Display Bonito build info string.
+
+Wed Nov  7 12:14:51 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/mips.S (__start): Restrict disabling of cache errors to
+	R5500 v1.0.
+
+Wed Oct 31 11:47:23 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S (cpu_data): Read intpol register after
+	writing and before doing self reset (is this really necessary?).
+
+	* pmon/go.c (goclient): Typo.
+	
+	* net/libc/getservent.c: Typo.
+
+Mon Oct 29 14:46:31 2001  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/go.c (go): Pass !continue argument to goclient().
+	(cont): Pass continue argument to goclient().
+	(goclient): If this is a "go", not a "cont", then don't single
+ 	step first instruction. 
+
+	* net/libc/getservent.c: Add new official "gdbremote" port number 2159.
+
+Mon Oct 29 13:44:44 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Yet more debugging... Fixed P6064
+	big-endian config cycles. 
+
+	* pmon/p6032/sbd.c: Added full list of supported(?!) CPU's.
+
+	* pmon/p6032/pci_machdep.c: Synced with SDE.   Added P6064
+	bigendian support for swapped config space. 
+
+Tue Oct 23 14:00:25 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* lib/rm7kcache.S: Deleted some bogus debug code that shouldn't 
+	  have got checked in.
+
+	* lib/cache.S: Use R54xx cache routines for R5500
+
+	* include/mips/prid.h (PRID_R5500): New processor type
+
+	* pmon/mips.S (__start): Disable cache exceptions for R5500
+
+	* pmon/p6032/sbdfreq.c (probefreq): If calculated pipefreq is too
+	small, set it back to a reasonable default (133MHz).
+
+	* pmon/p6032/sbdreset.S: Reenable soft reset.  Read config
+	register before doing RMW(!)  Set busmode for Vr5500.
+
+Tue Sep  4 18:19:21 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pcivar.h: Make _pci_maxbus a constant.
+
+	* pmon/pci/pciconf.c: Don't attempt to allocate IO or memory space
+	if none required. 
+
+	* pmon/p6032/smb.h: 
+
+	* pmon/p6032/sde-compat.h: 
+
+	* pmon/p6032/sbduflash.c: 
+
+	* pmon/p6032/sbdsmb.c: 
+
+	* pmon/p6032/sbdreset.S: Loads more debugging.  Take extra care
+	not to use cached address before caches are initialised.  Use
+	switches to set CPU multiplier on P6032 and P6064. Support parity
+	memory.  Bigendian support for P6064.
+
+	* pmon/p6032/sbdnet.c: 
+
+	* pmon/p6032/sbdics.c: 
+
+	* pmon/p6032/sbdflash8.c: 
+
+	* pmon/p6032/sbdflash16.c: 
+
+	* pmon/p6032/sbdflash.c: 
+
+	* pmon/p6032/sbdbflash.c: 
+
+	* pmon/p6032/reginit.s: 
+
+	* pmon/p6032/reginit.h: 
+
+	* pmon/p6032/ns16550.c: 
+
+	* pmon/p6032/ics9148.h: 
+
+	* pmon/p6032/hd2532.h: 
+
+	* pmon/p6032/flash8.h: 
+
+	* pmon/p6032/flash16.h: 
+
+	* pmon/p6032/flash.c: 
+
+	* pmon/p6032/sbdfreq.c: Correctly decode CPU clock multiplier for
+	QED CPUs.
+
+	* pmon/p6032/sbdflashenv.c: Updated copyright.  Use sbd_switches
+	and sbd_boardtype to decise when to ignore onboard environment.
+
+	* pmon/p6032/sbdenv.c: Updated from SDE
+	
+	* pmon/p6032/sbd.c: Updated copyright.  Added sbd_pcbrev,
+	sbd_modrev sbd_boardtype and sbd_switches.  Enable Bonito and
+	debug interrupts.  Debounce debug switch.
+
+	* pmon/p6032/sbdenv.c: Updated copyright message
+
+	* pmon/p6032/pci_machdep.c: Set # supported PCI buses to MAXBUS(3)
+	Set access type in configuration writes.
+
+	* pmon/set.c: sbd_env_suppress -> _sbd_env_suppress
+
+	* pmon/pmon.h: Avoid clash with sreg_t definitions in rm7kc0.h
+
+	* pmon/main.c: Added P6032/P6064 to supported boards
+
+	* net/sys/drivers/if_le_pci.c: Use rtohl in DWIO code to avoid
+	truncating value in bigendian mode.
+
+	* net/sys/drivers/am7990reg.h: Removed bogus bigendian ifdef in
+	descriptor definitions.
+
+Sun Aug 12 15:14:15 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/mips.S: Save RM7000 info register.
+
+	* pmon/regdefs.c: RM7000 Info register description.
+
+	* pmon/pmon.h: Added RM7000 Info register.
+
+Sun Aug 12 12:37:12 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Enable parity on P6064.
+
+	* pmon/p6032/sbdflashenv.c: Check the boot record to see if ITROM
+	is installed before resetting the environment.  Use switch to
+	suppress board environment.
+
+	* pmon/p6032/sbduflash.c: Read Bonito to determine flash width.
+	
+	* pmon/p6032/sbdbflash.c: Read Bonito to determine flash width.
+	Set envrionment partition.
+
+	* pmon/p6032/sbd.h: P6032/P6064 merge.  Defined CPLD switch
+	positions. 
+
+	* pmon/p6032/sbd.c: Recognise RM700 processor ID (more needed).
+	Distinguish P6302/P6064 board revisions.  Set memsize environment
+	variable size from low memory.  Display CPLD revision.  Only do
+	addersss twiddling for big-endian P6032 IO routines.
+
+	* pmon/p6032/reginit.s: Only use lwu if __mips64 is defined.
+
+	* pmon/p6032/pci_machdep.c: Skip Bonito during scan because it is
+	connected on P6064. Added bflush (Bonito flush).  Merged some
+	additional changes from SDE.
+
+	* pmon/p6032/ns16550.h: layout->nslayout.
+
+	* pmon/p6032/i82371eb.h: Define a few more power management
+	register bits.
+
+	* pmon/p6032/smb.h: 
+	* pmon/p6032/sbdtod.c: 
+	* pmon/p6032/sbdsmb.c: 
+	* pmon/p6032/sbdrtc.c: 
+	* pmon/p6032/sbdnvram.c: 
+	* pmon/p6032/sbdics.c: 
+	* pmon/p6032/sbdfreq.c: 
+	* pmon/p6032/sbdflash8.c: 
+	* pmon/p6032/sbdflash16.c: 
+	* pmon/p6032/sbdflash.c: 
+	* pmon/p6032/sbdapc.c: 
+	* pmon/p6032/ics9148.h: 
+	* pmon/p6032/flash8.h: 
+	* pmon/p6032/flash16.h: P6032/P6064 merge (comments only)
+
+	* pmon/p6032/Makefile: Build P6064 ROMS as well.
+
+	* pmon/p5064/sbd.c: Set memsize environment from copy in low memory.
+
+	* pmon/set.c: If sbd_env_suppress returns true, don't updated
+	environment with board settings.  Added weak version of
+	sbd_env_suppress. 
+
+	* pmon/mips.S: Removed boot record definitions (now in bt.h)
+
+	* pmon/cmdtable.c: Off command for P6064
+
+	* pmon/bt.h: New file containing boot record definitions.
+
+	* lib/rm7kcache.S: Nigels cache updates.
+
+Fri Aug  3 02:56:44 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* lib/rm7kcache.S: Updated from SDE
+
+	* include/mips/rm7kc0.h: Updated from SDE
+
+Wed May 30 15:42:16 2001  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_query_dev_func): Just skip over empty
+ 	base address registers, don't terminate the scan.
+
+Fri May 11 13:02:14 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Use switch settings to modify alternate
+	bootmode bits.  ITBASE->BOOTPKG
+
+	* pmon/p6032/sbdfreq.c: RM7000 compatible rate multipliers for
+	RM5261 in alternate clock mode.
+
+	* pmon/p6032/sbdflashenv.c: ITBASE -> BOOTPKG 
+
+	* pmon/p6032/sbdnvram.c: Ditto
+
+	* pmon/p6032/sbd.h: Added CPLD defines.
+
+	* pmon/p6032/sbd.c (sbd_boardenv): Set memsize environment
+	variable unless it has been previously defined.
+	(getmachtype): Recognise 64474 processor ID.
+
+	* pmon/p5064/sbd.c (sbd_boardenv): Set memsize environment
+	variable unless it has been previously defined.
+
+	* pmon/P5064/targets.mk: Removed ITBASE from flags
+
+	* pmon/P6032/targets.mk: Ditto
+
+Fri Feb  9 15:18:19 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdsmb.c: Bigendian changes for P6032
+
+	* pmon/p6032/sbd.h: ditto
+
+	* pmon/p6032/sbdreset.S: ditto
+
+	* pmon/p6032/sbd.c: ditto
+
+	* pmon/p6032/ns16550.h: ditto
+
+	* net/sys/drivers/am7990.c: ditto
+
+	* net/sys/drivers/if_le_pci.c: ditto
+
+	* net/sys/drivers/am7990reg.h: ditto
+
+Thu Jan  4 12:03:24 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/mips.S: Removed dependencies on ITBASE.  PMON now uses boot
+	package information to run ITROM.
+
+Wed Jan  3 09:48:04 2001  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sde-compat.h: Removed all compatibility code, but
+	leave the file as a placeholder for any future SDE/PMON
+	incompatibilities.
+
+	* pmon/p6032/sbdreset.S: Removed ITBASE checks.  Undefine DBGSBD
+
+	* pmon/p6032/flash.c: Updated headers
+
+	* pmon/p6032/sbduflash.c: Ditto
+
+	* pmon/p6032/sbdflashenv.c: Ditto
+
+	* pmon/p6032/sbdflash8.c: Ditto
+
+	* pmon/p6032/sbdflash16.c: Ditto
+
+	* pmon/p6032/sbdflash.c: Ditto
+
+	* pmon/p6032/sbdenv.c: Ditto
+
+	* pmon/p6032/sbdbflash.c: Ditto
+
+	* pmon/p6032/sbd.c: Ensure SR_DE is set for Rev1.3 5432.
+
+	* pmon/p6032/flashrom.c: Updated from SDE
+
+	* pmon/P6032/targets.mk: Switch back to sbin as the default format.
+
+	* pmon/mips.S: Disable cache errors for Rev1.3 5432 (I think this
+	is already done in hardware, but at least the SR_DE bit will show
+	that they are disabled).  Don't access RM7000 watchmask register on
+	non-rm7000 processors because it can cause a trap on some processors.
+
+	* net/sys/drivers/if_le_pci.c: Changed LED1/LED3 usage to match manual
+
+	* include/mips/cpu.h: Updated from SDE
+
+Fri Nov 24 10:10:32 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Use sticky selfreset bit to decide
+	whether a self-reset is required (this avoids conflicts with itrom
+	when it uses the intpol register)
+
+	* pmon/p6032/sbd.h: Added CPLD_BASE definition.  Corrected some
+	ICU_* definitions. 
+
+	* pmon/P6032/targets.mk: Added ITBASE to MACHINE macros.  Build
+	bigendian version as well.
+
+	* net/sys/drivers/if_de.c: Only print link down messages if the
+	interface was up.  Changed the full duplex setting in PHYCAPTTM to
+	half-duplex (is this right?)
+
+Tue Nov 14 14:59:31 2000  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pcidevs.c: Replaced NetBSD copyright message.
+
+Thu Nov  9 17:04:45 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/go.c (exception): Remove break points before calling stop()
+	so that disassembly is correct. 
+
+Thu Nov  9 16:47:09 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbd.c: Clear display before starting a new message in
+	sbdmessage.  Use msdelay instead of sbddelay.  Reduce LED scrolling
+	delay.
+
+	* pmon/p6032/display.c: Don't skip leading blanks in led_message. 
+
+	* pmon/pci/pcidevs: Added Bonito and IDT PCI controllers
+
+Thu Nov  2 10:06:38 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbd.h: Renamed some PIO bits.  Moved GPIO_PORT
+	(curently unused) to make way for the BMDMA port which PCI BIOS'
+	set to 0xf000.
+
+	* pmon/p6032/sbdreset.S: Don't set passive release which
+	interferes with the Bonito arbiter.
+
+	* pmon/p4032/rtc.c: Set RTC weekday from tm structure.
+
+	* net/sys/drivers/if_le_pci.c: Update the SROM checksum after
+	patching the ethernet address
+
+Tue Oct 24 18:25:30 2000  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_ppbinit): Call _pci_canscan() be
+	accessing device.
+	(_pci_ppbfind): Ditto.
+
+	* mktar: Explicitly use gnu tar.
+
+	* exclude: Use pattern pmon/xxx rather than ./pmon/xxx
+
+Tue Oct 24 12:33:56 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/drivers/if_le_pci.c (le_pci_attach): Use 32 bit accesses
+	to initialise ROM space if in DWIO mode.
+
+Fri Oct 20 01:11:40 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/P4032/targets.mk: Bumped ITBASE to bfc64000
+
+	* pmon/p4032/sbd.c: ESC_CAUSE->CEXC_CAUSE
+
+	* lib/rm7kcache.S: More reconciliation with SDE-MIPS.  Tidied up
+	secondary cache sizing.
+
+Mon Oct 16 19:07:23 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/hurricane/sbd.c: Updated 4300/4310 frequency table.
+
+	* pmon/gal9/sbd.c: Ditto
+	
+	* pmon/p6032/sbdfreq.c: Updated 4300/4310 frequency table.
+
+	* pmon/p6032/sbd.h: New PCI reset GPIO bit
+
+	* pmon/p6032/sbdreset.S: Use KSEG1 to access initialisation
+	table. Reset PCI bus and include a huge delay to allow the PIIX4
+	to set itself up properly.
+
+Thu Oct 12 12:16:07 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: 
+
+	* pmon/p6032/sbd.h: PCI reset now on GPIO5
+
+	* net/sys/drivers/if_le_pci.c: Always use DWIO mode.  The chip
+	automatically switches into DWIO mode when it sees a 32 bit
+	access.  Unfortunateley early 5230's always do a 32 bit read if
+	the byte offset is 0.
+
+	* net/sys/drivers/if_levar.h: DWIO changes
+
+	* net/sys/drivers/am7990.c: Removed more debug code.
+	Don't explicitly set BREADE/BWRITE - rely on EEROM (or EEROM
+	emulation) to do it for us.
+
+Thu Oct  5 11:49:05 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdbflash.c: No need from bflash.h any more.
+
+	* pmon/p6032/flashrom.h: Only define the hardware related stuff if
+	FROM_WIDTH is defined.
+
+	* pmon/p6032/sbduflash.c: Can't do FROM_DEBUG from FLASH! No need
+	for uflash.h any more. 
+
+Thu Oct  5 00:17:09 2000  Chris Dearman  <chris@algor.co.uk>
+	* pmon/p6032/*.c: Updates and imports from SDE
+	
+	* net/sys/drivers/if_le_pci.c: Try to initialise registers
+	correctly if no EEROM is installed.
+
+Wed Sep 27 09:06:23 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Disable RTC and KBD chip selects.  Set
+	TOM register in bridge instead of randomly writing to port 69.
+	Turn most special purpose pins into GPIO ones.  Initialise the ISA
+	refresh clock.  Program the ISA ICU to the default state.  Don't
+	enable the PC97307 PIO (why not?). 
+
+	* pmon/p6032/i82371eb.h: Removed some PIIX3 definitions and added
+	some PIIX4 ones.
+
+	* pmon/p6032/bonito.h: Missing parentheses in PCIMEMBASE macro.
+
+	* pmon/devaz/bonito.h: Ditto
+
+Mon Sep 25 10:38:37 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Reinstated iobc on bar0
+
+	* pmon/p6032/sbd.h: Add missing GPIN interrupts.
+
+Fri Sep 22 10:17:51 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdfreq.c: Fixed frequency caclulation.
+
+	* pmon/p6032/sbd.c: Removed centering code again.  There is dome
+	dependency on this that I haven't worked out yet.
+
+	* net/sys/drivers/if_le_pci.c: Turn of debugging.  Force ethernet
+	address bit 0 to be 0(!).  Set DXSUFLO to avoid transmit underflows.
+
+Thu Sep 14 10:25:35 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Undefined debug code.
+
+	* pmon/p6032/sbdnet.c: Blink led.  Initialise current system time
+	from RTC
+
+	* pmon/p6032/sbdfreq.c: Determine clock speed if not setting it
+	directly. 
+
+	* pmon/p6032/sbd.c: Initialise RTC periodic interrupt.  Added RTC
+	poll for !INET builds.  Remove some debug code from display
+	handler.  Do NL->CRLF conversion in _mon_puts
+
+	* net/sys/drivers/am7990.c: Removed dbeug code.  Always set
+	BREADE and BWRITE.  Set port selctor for 79c973. Mask lengths in
+	initialisation block.  Monitor link status in a kludgy way.  Set
+	ether_type for received packets.  Use speacial code to copy
+	descriptors so that the owned bit is set last.
+
+Wed Sep 13 16:17:13 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Disable Bonito cache.  Disable PIIX4 RTC.
+
+	* pmon/p6032/sbdnet.c: ethaddr is optional - eventually it will be
+	stored in the onboard eerom
+
+	* pmon/p6032/sbd.c: Disabled display centering (temporary).  Added
+	off command.
+
+	* pmon/cmdtable.c: Added P6032 off command
+
+Thu Aug 31 12:04:43 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbd.c: _mon_putc & _mon_puts 
+
+	* net/sys/drivers/if_levar.h: 
+	* net/sys/drivers/if_le_pci.c: 
+	* net/sys/drivers/am7990.c: YMD to see why it doesn't work
+
+Wed Aug 23 15:17:43 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p6032/sbdreset.S: Added lowlevel debug code
+
+	* pmon/p6032/sbd.c: 
+	* pmon/p6032/rtcenv.c: Deleted debug code
+
+	* net/sys/drivers/if_le_pci.c: enable debug
+
+	* net/sys/drivers/am7990.c: Various debug bits enabled
+
+Thu Aug  3 23:26:02 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pcidevs: Updated from OpenBSD
+	
+	* pmon/pci/pcidevs_data.h: Rebuilt
+	
+	* pmon/pci/pcidevs.h: Rebuilt
+
+	* pmon/target.mk: Added _KERNEL to default CCFLAGS
+
+Thu Aug  3 11:36:56 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/drivers/dc21040reg.h: Changed lengthmask from 0x3ff to 0x7ff
+
+Fri Jun 16 22:17:59 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* net/cmd/bootp.c (boot_bootp): Set broadcast bit in BOOTP request
+	to make modern dhcp/bootp servers broadcast the BOOTP response.
+
+Sat Apr 15 01:31:45 2000  Chris Dearman  <chris@algor.co.uk>
+
+	* net/cmd/ifconfig.c (ifconfig): Set the default interface address
+	to INADDR_ANY (0.0.0.0) and broadcast to INADDR_BROADCAST
+	(255.255.255,255).  Using an address of 127.0.0.2 persuades the
+	ethernet driver to ARP this address (to check for uniqueness).
+	This is bad, but it is compounded by a nameless router that
+	responds with its own ethernet address!
+
+	* net/sys/netinet/ip_input.c (ipintr): Removed special case
+	handling of net 127.0.0.0 for bootp (see above)
+
+	* net/cmd/bootp.c (boot_bootp): Set minimum timeout to 3s to allow
+	TP autonegotiation to complete.  Do not wait for the complete
+	timeout period if we have all the information required.  Keep
+	elapsed time in microseconds to precisely count the timeout
+	period.
+	
+
+Tue Mar 28 22:25:54 2000  Nigel Stephens  <nigel@algor.co.uk>
+
+	* mktar: Create tar distribution.
+
+	* exclude: List of files to exclude from tar distribution.
+
+Tue Mar 28 20:40:48 2000  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/watchpoint.h: Add new address check error codes.
+
+	* pmon/watch.c: Add some comments.
+	(_mips_watchpoint_init): Return number of watchpoints if already
+	initialised. 
+	(_mips_watchpoint_set_callback): Dummy version of callback which
+	allows host to check that watchpoint range is OK.
+	(_mips_watchpoint_set): Handle virt-to-phys translation if phys
+	addr is zero and cpu doesn't support virtual address
+	watchpoints. Call _mips_watchpoint_set_callback as final check.
+	
+	* pmon/r4kwatch.c (r4650_set): Return mask that we are using in
+ 	wp->mask.
+
+	* pmon/r4650watch.c: Rename align to mask.
+	(r4650_set): Return mask that we are using in wp->mask.
+	
+	* pmon/go.c (_mips_watchpoint_set_callback): New function which
+	checks that the watchpoint which is about to be installed doesn't
+	overlap with any of PMON's own data regions.
+	(setbpt): Check for bad address or overlap returns when setting
+	watchpoint. 
+	(setbp): Ditto. Plus print breakpoints and watchpoints in same
+	format. 
+	(dspbpts): Plus print breakpoints and watchpoints in same format.
+
+Tue Mar 28 01:18:40 2000  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/algvme/sbd.c: Rename EXC_* to CEXC_*.
+	* pmon/xds/sbd.c: Ditto.
+	* pmon/temic/sbd.c: Ditto.
+	* pmon/p5064/sbd.c: Ditto.
+	* pmon/p4032/sbd.c: Ditto.
+	* pmon/p4000/sbd.c: Ditto.
+	* pmon/nec5074/sbd.c: Ditto.
+	* pmon/midas/sbd.c: Ditto.
+	* pmon/laserfold/sbd.c: Ditto.
+	* pmon/hurricane/sbd.c: Ditto.
+	* pmon/glacier/sbd.c: Ditto.
+	* pmon/fnc6/sbd.c: Ditto.
+	* pmon/devaz/sbd.c: Ditto.
+	* pmon/cudig/sbd.c: Ditto.
+	* pmon/cogent/sbd.c: Ditto.
+
+	* pmon/pci/pcivar.h: Removed PMON specific typedefs, now in
+	sys/types.h.
+	(_pci_maxbus): no longer a const.
+
+	* pmon/p5064/pci_machdep.c (_pci_maxbus): no longer a const.
+
+	* pmon/P5064/targets.mk: Raised ITBASE to 0xbfc64000.
+
+	* pmon/watchpoint.h: Warchpoint support functions from SDE-MIPS.
+	* pmon/watch.c: Ditto.
+	* pmon/rm7kwatch.c: Ditto.
+	* pmon/r5kwatch.c: Ditto.
+	* pmon/r4kwatch.c: Ditto.
+	* pmon/r4650watch.c: Ditto.
+
+	* pmon/regs.c: Use sreg_t instead of reg_t.
+
+	* pmon/regdefs.c (Stat): Add XX bit for R5000 et al.  Rename
+ 	"IM&SW" to "IM", you know it makes sense.
+	(Caus): Remove separate SW field, so that IP lines up with IM in
+ 	status register.  Add RM7000 specific fields.
+	(Icrspec): Description of RM7000 interrupt control reg layout.
+	(reglist): WATCHLO & WATCHHI disabled for RM7000; WATCH1, WATCH2,
+ 	WATCHMASK, ICR, IPLLO & IPLHI added for RM7000.
+	
+	* pmon/pmon.h (MAX_BPT): Increased from 32 to 64 to handle remote
+	debugging and watchpoints.
+	(trace_mode): Added new modes to handle watchpoint startup and
+	stepping over inexact watchpoints.
+	(reg_t): Now unsigned to match SDE-MIPS.
+	(sreg_t): New signed register type to match SDE-MIPS.
+	(struct Bps): Added watchpoint type and length.
+	(time_t): Now signed long to match SDE-MIPS.
+	(R_WATCHMASK, WatchMask): New RM7000-specific register.
+	(R_ICR, Icr): Ditto.
+	(R_IPLLO, IplLo): Ditto.
+	(R_IPLHI, IplHi): Ditto.
+	
+	* pmon/mips.S (__start): Use 64-bit ops to clear watchpoint regs.
+	(cliexit): Reset RM7000 interrupt registers.
+	(_go): Reload RM7000 interrupt registers and watchmask.
+	Restore watchlo/watchhi a bit earlier, since RM7000 seems to need
+	a long gap between setting them and any instruction that might
+	trigger them.
+	(_exception): Store and disable both watchpoint registers.
+	Store and disable RM7000 interrupt registers and watchmask.
+	Clear Cause register before clearing Sr.EXL, in probably vain 
+	attempt to prevent recursive watchpoints
+	
+	* pmon/main.c (dbginit): Initialise watchpoints.
+
+	* pmon/loadfn.c (dl_initialise): Reset watchpoints when loading
+	new program.
+
+	* pmon/go.c (go): Clear extra RM7000 interrupt registers
+	when starting new client.
+	(trace): Use sreg_t instead of reg_t.
+	(clrbpt, setbpt): New worker functions for remote debug protocol
+	to set and clear watchpoints and breakpoints.
+	(setbp): Now implements watchpoints in non-machine specific way
+	using the new facilities.
+	(dspbpts): Display new-style watchpoints.
+	(clrbp): Clear new-style watchpionts.
+	(rm_bpts): Remove new-style watchpoints.
+	(clrbpts): Clear new-style watchpionts.
+	(goclient): Always start with a single-step, in case we are
+	pointing at an instruction which hit a watchpoint.
+	(godebug): New worker function for remote debug protocol to start
+	the client task after inserting breakpoints and watchpoints.
+	(pmexception): Use new CEXC codes, to avoid SDE-MIPS header clash.
+	(exception): Ditto, and handle inexact watchpoints by stepping
+	over them quietly without bothering the user. Report h/w
+	watchpoints when they occur.
+	(store_breakpoint): Insert new watchpoints.
+	(is_breakpoint): Ignore watchpoints.
+	(getsavedreg): Use sreg_t not reg_t.
+	(stacktrace): Ditto.
+	
+	* pmon/debug.c (debug): Clear extra RM7000 interrupt registers
+	and PMON breakpoints when starting new client.
+	(dbgmode): Add watchpoint/breakpoint support.
+	(mapdbgreg) Now returns an sreg_t.
+	(getdbgreg): Ditto.
+	(putdbgreg): Ditto, and also value argument.
+	(do_req): Use sreg_t instead of reg_t.
+	The 'x' request now clears breakpoints and call cliexit() to reset
+	other registers.
+	Added 'b' and 'B' reguests to implement watchpoints and
+	breakpoints. 
+	
+	* pmon/files.mk: Add watchpoint support files from SDE-MIPS.
+
+	* pmon/commands.c (dump): Pass sreg_t * to disp_as_reg().
+	
+	* pmon/cmdtable.c (b): List new arguments for "b" command.
+
+	* net/sys/sys/systm.h: Add forward declaration of struct tty.
+
+	* net/sys/sys/kernel.h: Don't declare avenrun when in PMON.
+
+	* include/mips.h: Modified to work when included along with
+	SDE-MIPS cpu header files. Added RM7000-specific register defs.
+
+	* include/mips/cpu.h: Added from SDE-MIPS for watchpoint support.
+	* include/mips/types.h: Ditto.
+	* include/mips/r4ktlb.h: Ditto.
+	* include/mips/r4650.h: Ditto.
+	* include/mips/r3ktlb.h: Ditto.
+	* include/mips/notlb.h: Ditto.
+	* include/mips/m16c0.h: Ditto.
+	* include/mips/instrdef.h: Ditto.
+	* include/sys/types.h: Ditto.
+
+	* include/mips/prid.h: Updated to latest SDE-MIPS version.
+	* include/mips/rm7kc0.h: Ditto
+	* include/mips/r5kc0.h: Ditto.
+	* include/mips/r4kc0.h: Ditto.
+	* include/mips/r3kc0.h: Ditto.
+
+Thu Dec 16 12:54:29 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_setup_devices): Oops.  Should be
+	enabling both memory and i/o windows regardless.
+	
+Thu Dec 16 12:39:06 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_setup_devices): devices without I/O
+	windows weren't being initialised correctly.
+
+Wed Dec  8 12:04:55 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/JALGO/Makefile: New build directory for Jalgo module on
+ 	P-4032 (sadly can't run standard P-4032 PMON since 64-bit opcodes
+ 	are not available).
+
+	* pmon/pci/pcivar.h: Declare _pci_maxbus as an extern "const".
+
+	* pmon/p5064/sbdreset.S: Don't force 64-bit support when compiled
+	-mips32 (i.e. for Jade). Add 32-bit variants of memory clear
+	loops. Fix reginit stuff too.
+
+	* pmon/p5064/sbd.h: Updated maximum cpu pipeline frequency to
+ 	250MHz for newer cpus.
+
+	* pmon/p5064/sbd.c (getmachtype): Recognise Jade, RC64474 and
+	RC64574 cpu types. 
+
+	* pmon/p5064/pci_machdep.c (_pci_hwinit): Added extern declaration
+	for _sbd_getenv().
+	(_pci_conf_read32): Only included if not already defined as a
+	macro. 
+	(_pci_conf_write32): Ditto.
+
+	* pmon/p4032/sbd.h: Updated maximum cpu pipeline frequency to
+ 	250MHz for IDT RC64[45]74 running at 75MHz*3 or 62MHz*4. Important
+ 	so that serial EEROM accesses work!
+
+	* pmon/mips.S: Remove floating point save/restore when FLOATINGPT
+	not defined.
+
+	* pmon/mipsram.S: Ditto.
+
+	* pmon/go.c (exception): Print cause reg in hex as well as
+	symbolically. 
+
+	* pmon/dis.c (disasm): Don't include floating point code when
+	FLOATINGPT is not defined.
+
+	* lib/r4kcache.S: Check for Jade cpu.
+
+	* include/mips/prid.h: Added PRID_JADE.
+
+Thu Nov 18 16:20:19 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/regs.c: Set each field of a register individually to
+	deal with read-only fields.
+
+	* pmon/regdefs.c: Added missing undefined EP field strings.
+
+	* pmon/dis.c: Cache operation code was being disassembled
+	incorrectly.
+
+Wed Sep 29 22:00:40 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/devaz/bflash.h: Bigendian CODE support.
+
+	* pmon/devaz/flashrom.c: Added SGS 29F040
+
+	* pmon/devaz/flashrom.h: Ditto
+
+	* pmon/devaz/sbd.c: Don't set a default ethernet address in the
+	environment.
+
+Tue Aug 17 14:11:13 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Merge and resync with SDE-MIPS version.
+
+	* pmon/pci/pcivar.h: Ditto.
+
+Mon Aug 16 22:46:16 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pcivar.h: Add new pci_match structure, and define
+	_pci_find() function prototype (from SDE-MIPS).
+
+	* pmon/pci/pcidevs: Add emacs "compile-command".
+
+	* pmon/pci/pciconf.c: Simplify pci-pci bridge code by using
+	pointers, not array indices.
+	(_pci_setup_devices): Enable all devices first, before calling
+	driver initialisation functions. When not initialising wait a
+	while for bus controller to initialise device, before giving up on
+	it.
+	(_pci_ppbfind): New passive pci-pci bus discovery function for
+	when we aren't initialising the bus ourselves.
+	(_pci_configure): Call _pci_ppbinit() or _pci_ppbfind(), depending
+	whether or not we are initialising the bus.
+	
+	* pmon/p4032/pci_machdep.c (_pci_conf_read, _pci_conf_write): Max
+	device number is 31 not 15 for type 1 cycles.
+
+	* pmon/devaz/sbdreset.S: Add support for CPUs with serial boot
+	mode streams.  Tidy up initial coprocessor register
+	initialisation, in line with SDE-MIPS gas changes. Reset sdShape
+	to zero for each DIMM; if no DIMM is present set the new ABSENT
+	bit. Don't write to SDCFG register if we're already running in
+	RAM.  Also if running in RAM decrement memory size by 4MB (which
+	is where we are). Switch on "cacheing" in each aperture, and
+	switch on all IOBC features.  Change all delays to assume that we
+	may be running in RAM not ROM.
+
+	* pmon/devaz/sbdfreq.c: Pick a fixed bus clock frequency, based on
+	whether this is ASIC or FPGA version of Bonito.
+
+	* pmon/devaz/sbd.h (nsdelay, usdelay, msdelay): Use new
+	_sbd_nsdelay() function (see sbd.c).
+
+	* pmon/devaz/sbd.c (sbdmachinfo): Print revision number as x.y
+	(sbd_cycle): Removed.
+	(_sbd_nsdelay): Nanosecond delay function which uses cpu count
+	register to achieve "accurate" delay, wherever we are running.
+	(_bonito_iobc_cmd): Write cachectrl register first without EXEC
+	bit, to ensure we get an edge.
+	(_bonito_iobc_wbinv): Move write queue flush out of loop.
+
+	* pmon/devaz/pci_machdep.c (pci_hwinit): Check SYSCONTROLLER bit
+	to decide whether we are bus controller.  Generate reset if we are
+	bus controller.
+
+	* pmon/devaz/bonito.h: Update to latest version.
+
+	* pmon/cudig/ns16550.c: Put back accidentally deleted include files.
+
+	* net/sys/drivers/if_de.c (tulip_reset): Call inval_dcache() when
+	freeing receive buffers.
+	(tulip_rx_intr): Call inval_dcache() for fast path, when packet is
+	in one buffer.
+
+	* include/mips/prid.h: Add IDT RC64574 processor id.
+
+	* include/mips.h: Add CFG_C_WBACK alias for compatibility with
+	SDE-MIPS. 
+
+Mon Aug  2 13:37:41 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/pci_machdep.c (_sbd_getenv): Backwards compatibility
+	for PMON.
+	(pci_hwinit): Initialise pcireserved to avoid scanning devices >=
+	21. 
+
+	* pmon/devaz/uflash.h (FROM_READ_CONTIGUOUS): True when reading
+	big-endian code on a big-endian cpu.
+	(fromrline): Don't flip address bit 1 if we are reading big-endian
+	code on a big-endian cpu.
+	(frompline): Ditto for writing.
+	
+	* pmon/devaz/sbdfreq.c (_sbd_cpufreq): Oh dear, we can't actually
+ 	read the SysClk frequency from the synthesiser, because it
+ 	initialises its register to zero, not the actual frequency
+ 	selected by the links.  We could though programatically change the
+ 	frequency....
+	
+	* pmon/devaz/sbd.c (sbdmachinfo): Display whether this is the FPGA
+	or ASIC version of Bonito.
+	(_bonito_clean_dcache): New function to make sure i/o buffer cache
+	is flushed when the cpu cache is written-back.
+	(_bonito_inval_dcache): Ditto when cpu cache is invalidated.
+
+	* pmon/devaz/sbd.h (sbd_clean_dcache): Define as _bonito_clean_dcache.
+	(sbd_inval_dcache): Define as _bonito_inval_dcache.
+	
+	* pmon/devaz/bonito.h: Latest version.
+
+	* net/sys/drivers/if_de.c (clean_dcache): Use sbd_clean_dcache()
+	if defined.
+	(tulip_rx_intr): Call inval_dcache() on newly received buffer so
+	that bonito can flush its i/o buffer cache (todo: remove
+	clean_dcache when putting rx mbuf back in descriptor).
+
+Fri Jul 30 11:58:50 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/devaz/Makefile: Rebuild bonito.h from h/w design.
+
+	* pmon/pci/Makefile: Rebuild from pcidev source and header from
+	database. 
+
+	* pmon/devaz/pci_machdep.c (pci_hwinit): Mask BAR1 address
+ 	register to get configured address.
+
+Fri Jul 23 22:40:59 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/devaz/sbdreset.S: Set BAR1 to minimum size to give P4032 a
+	chance to configure us when we have big memory installed.
+
+	* pmon/devaz/sbdics.c: Use usdelay instead of mips_cycle
+
+	* pmon/devaz/sbd.h: nsdelay/usdelay/msdelay cycle counts now
+	determined by sbd_cycle();
+
+	* pmon/devaz/sbd.c: Added 5432 to recognised processors. Use
+	sbd_cycle to select an appropriate cycle count for delay loops
+
+	* pmon/devaz/pci_machdep.c: Wait for up to 3s for us to be
+	configured in slave mode.
+
+	* pmon/devaz/ns16550.c: Use usdelay instead of sbddelay.
+
+	* pmon/devaz/flashrom.c: Delay is dependent on where the code is
+	running. 
+
+	* pmon/devaz/bonito.h: Updated to rev 1.19
+
+	* net/sys/drivers/if_de.c: Always call tulip_init when doing a
+	linkup even if the media hasn't changed.  Yet more debug.
+
+Thu Jul 22 20:01:22 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* include/mips.h: Add R54xx Config register specials.
+	
+	* include/r4kc0.h: Ditto.
+
+	* pmon/devaz/sbdreset.S: Initialise Vr54xx bus mode in Config register.
+
+	* pmon/devaz/sbdfreq.c: Handle Vr54xx clock divide ratios.
+
+	* pmon/nec5074/pci_machdep.c: Increase MAXBUS to 3, you never know!
+
+Mon Jul 12 17:38:16 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/gal9/sbdpci.c: Secondary bus changes.
+	
+	* pmon/temic/pci_machdep.c: Ditto
+
+	* pmon/nec5074/pci_machdep.c: Ditto
+
+	* pmon/hurricane/pci_machdep.c: Ditto
+
+	* pmon/glacier/pci_machdep.c: Ditto
+
+	* pmon/p4032/pci_machdep.c: Secondary bus changes. Added
+	pcimaster/pcislave processing. 
+
+	* pmon/pci/pciconf.c: Secondary bus code derived from V3.
+
+	* pmon/pci/pcivar.h: Secondary bus changes.
+
+	* pmon/pci/pcireg.h: Added PCI_*MAX constants.  Fixed PCI_INETRRUPT_REG
+	register address.  Added PCI-PCI bridge constants.
+
+	* pmon/pci/pcidevs: Added V3 & Bonito device ID's
+
+	* pmon/p5064/sbd.c: Added missing mips_icache_size declaration.
+
+	* pmon/p5064/pci_machdep.c: Added (untested) support for secondary
+	PCI bus.
+
+	* pmon/devaz/uflash.h: Dsiable FROM_DEBUG.  Just use #endian(big)
+	in endianess test.  Added missing \ in fromconvert macro.
+
+	* pmon/devaz/sbdreset.S: Set master and slave byte swappers in
+	bigendian mode.
+
+	* pmon/devaz/sbdnet.c: return ethernet address if needed.
+
+	* pmon/devaz/sbd.c: Add a default ethernet address for when it
+	wants to use the P4032 ethernet - probably not a very good idea.
+	Print out the FPGA revision number during startup.
+
+	* pmon/devaz/pci_machdep.c: Removed some debug code now that
+	config cycles are working as expected.
+
+	* pmon/devaz/flashrom.c: Fix debug code in PMON
+
+	* pmon/devaz/bonito.h: Latest version
+
+	* pmon/DEVAZ/targets.mk: Disable FROM_DEBUG.
+
+	* net/sys/drivers/if_de.c: Added yet more debug code.  Added DEVAZ
+	support.
+
+Tue Jul  6 13:56:48 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/devaz/uflash.h: First cut at big-endian operation
+
+Thu Jul  1 13:28:32 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/devaz/sbdfreq.c: Initialise ics structure in case I2C read
+	fails
+
+	* pmon/devaz/sbdics.c: Latest version derived from from Temic
+
+	* pmon/devaz/sbdreset.S: New Bonito regsiter usage.  use memory
+	size to set BAR0 and BAR1 masks.  Set endianess and byteswap
+	appropriately. Configure IDE data buffers and unreset them.
+
+	* pmon/devaz/sbduflash.c: New Bonito register usage.
+
+	* pmon/devaz/sbdbflash.c: New Bonito register usage.
+
+	* pmon/devaz/sbd.h: Fit in with the changes made to bonito.h
+
+	* pmon/devaz/pci_machdep.c: Some real Bonito code to support the
+	PCI bus
+
+	* pmon/devaz/ns16550.c: FIFO counter restricted to unsigned char -
+	junk in the top bytes of the read was causing the FIFO test to fail.
+	
+
+	* pmon/devaz/flashrom.c: Changed dummy type to fromgroup_t.
+
+	* pmon/devaz/bonito.h: Latest revision of the register layout
+
+	* pmon/DEVAZ/targets.mk: Build both big-endian and little-endian.
+	Added PCI and network code.
+
+	* pmon/target.mk: Added rule to build upmon.s3
+
+	* lib/files.mk: Added strtol to library
+
+	* include/mips/prid.h: Added copyright
+
+	* include/errno.h: Added ERANGE for strtol
+
+Wed Jun 23 13:28:32 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/temic/sbdreset.S (_sbd_reset): Trigger analyser early on.
+	Initialise DPRAM semaphores.
+	Do relocation on call to mips_init_cache if we're IN_PMON.
+	Don't run memory clear cached, because cached access to EPROM is
+	broken. 
+	(reginit): Make DCSIO4 (SERCS) default to input not output.
+	Reversed DCS6 and DCS7 address bases.
+	Tuned EPROM/Flash and DPRAM access timings.
+	Ifdefed out interrupt enables.
+	(sbddisplay): New function, which reads from known location in EPROM.
+	(sbdblank): Dummy.
+	
+	* pmon/temic/sbdfrom.h (FROM_FAMILY_AM29DL): Fix typo.
+	(FROM_NBANKS): Comment out, will be variable on next rev.
+	
+	* pmon/temic/sbdfrom.c (_sbd_flashopen): Don't put rbase in kseg0,
+ 	since cached accesses to EPROM and Flash are broken. Add
+	workaround for missing flash address line on first prototype.
+
+	* pmon/temic/sbdfreq.c: Determine SysClk frequency by reading
+	clock synthesiser.
+
+	* pmon/temic/sbdflashenv.c (_sbd_env_force_reset): Fixed to look
+	for DCD/DTR loopback.
+
+	* pmon/temic/sbd.h: Added GPIO pin number usage.
+
+	* pmon/temic/sbd.c (_sbd_boardenv): New function to override PMON
+	default environment variables $ethaddr, $bootp=pri, $hostport=tty0.
+	(sbddisplay): Moved to sbdreset.S
+	(sbddbgintr): Convert exception status into a sequence of EPROM
+	reads from end of device.
+	
+	* pmon/temic/ns16550.c (nsinit): Ifdef out fifo initialisation,
+	the Nile-4 fifo is broken.
+
+	* pmon/temic/sbdnet.c: Added network support.
+
+	* pmon/temic/pci_machdep.c: Added PCI support.
+
+	* pmon/temic/ics9148.h: Header file for clock synthesiser.
+
+	* pmon/temic/sbdics.c: New code to read and write registers on
+	clock synthesiser using I2C interface.
+
+	* pmon/temic/flash*.[ch]: Added flash support.
+
+	* pmon/p4000/sbd.c (_sbd_boardenv): New board-specific function
+	which sets default ethernet address if none in non-volatile memory.
+	* pmon/p4032/sbd.c: Ditto.
+	
+	* pmon/p5064/sbd.c: Ditto
+	(sbdcpufreq): Fixed clock ratio conversion to account for new RM7000
+	2.5, 3.5 and 4.5 multipliers.
+	
+	* pmon/devaz/sbdfreq.c (_sbd_pipefreq): Divide pipeline frequency
+	by 2000000 not 2 to get 1us delay.
+
+	* pmon/devaz/sbdbflash.c: Put fcp->rbase in kseg0 if we're running
+	cached.
+
+	* pmon/devaz/sbduflash.c: Ditto.
+
+	* pmon/devaz/flashrom.c (findsector): Fixed out by one error in
+	sector number calculation, which was causing random failure in
+	last sector.
+
+	* pmon/nec5074/flashrom.c: Ditto.
+
+	* pmon/TEMIC/targets.mk: Define FTEXT as 80001000 so that pmon
+	gets copied to RAM.  Enable network and flash support.
+
+	* pmon/DEVAZ/targets.mk: Add -DFROM_DEBUG.
+
+	* pmon/mipsram.S (__assfail): New fatal assertion failure routine.
+	Call ROM version of printf and then hit breakpoint.
+
+	* pmon/mips.S (REGSZ): Define as 4 or 8, depending on __mips.
+	(SREG, LREG): Define in terms of "lr", "sr" and REGSZ macros.
+	(xxx_bev): Use "b" not "j".
+	(reset_exception): Use "b" not "j", and add third reset entrypoint
+ 	for ITROM.
+	(exception vectors): Use .origin instead of playing clever games
+	with .align to move to each boot vector.
+	(boot_table): Change our entrypoint to 0xbfc00010 (see
+	reset_exception above), since start may be a relocated RAM address.
+ 	(__start): Force to kseg1 using position-independent code.
+	Use bal instead of jal.
+	Remove rusty BSO Tasking initialisaion.
+	Add code to copy .text and .rdata to RAM if it is located there.
+	Use ld/sd to copy code and data to RAM, if __mips >= 3.
+	(__bev): Use SBD_DISPLAY to tell user we've had a fatal exception.
+	(__bev_fail): Don't try to call C exception handler if we are not
+	executing at our final location.
+	(copyHandler): Use ld/sd to copy handler if __mips >=3.
+	(__assfail): Fatal assertion failure routine.
+	
+	* pmon/set.c (stdenvtab): Remove "ethaddr", now done in
+ 	per-board code. Define "heaptop" using CLIENTPC, rather than fixed
+ 	80020000. Remove "fpfmt" and "fpdis" if FLOATINGPT is not defined.
+	(_setenv): Trivial optimisations.
+	(_getenv): New function which just looks in envvar[] table, and
+ 	ignores stdenvtab[].
+	(getenv): Use _getenv() if environment is fully initialised.
+	(_sbd_boardenv): Dummy weak function.
+	(envinit): Call _sbd_boardenv() before copying environment from
+ 	stdenvtab[], to allow board-specific code to override defaults.
+
+	* pmon/pmon.h: Prevent multiple inclusion.
+	(SBD_DISPLAY): Use "bal" not "jal".
+	(CHKPNT_CODE): New code for copying .text+.rdata to RAM.
+	(CHKPNT_BRDV): New code for calling board-specific environment
+	overrides. 
+	(CHKPNT_BEV): New code for boot exception.
+
+	* pmon/go.c (reboot): Don't call start() jump to 0xbfc00000.
+
+	* lib/rm7kcache.S: Added ultra-paranoid pipeline hazard avoidance.
+
+	* lib/memcmp.c: Added.
+
+	* lib/files.mk: Add memcmp.c
+
+	* lib/crt1.S: Fix PMON entrypoint for Algor PMON.
+
+	* include/assert.h: Make it work!
+
+Mon Jun 14 13:21:43 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* net/sys/drivers/if_de.c: Updated for TEMIC board.
+
+	* pmon/devaz/bflash.h: Updated to latest SDE-MIPS version.
+	* pmon/devaz/bonito.h: Ditto.
+	* pmon/devaz/flashrom.c: Ditto.
+	* pmon/devaz/flashrom.h: Ditto.
+	* pmon/devaz/sbd.h: Ditto.
+	* pmon/devaz/sbdbflash.c: Ditto.
+	* pmon/devaz/sbdflashenv.c: Ditto.
+	* pmon/devaz/sbduflash.c: Ditto.
+	* pmon/devaz/uflash.h: Ditto.
+
+	* pmon/devaz/sbdflash.c: Added indirection layer to select between
+	flash devices.
+
+	* pmon/devaz/flash.c: Added "standard" PMON flash interface.
+
+	* pmon/DEVAZ/targets.mk (MACHINE): Enable -DFLASH
+	(MACHOBJ): Add flash modules.
+	
+
+Mon Jun  7 14:50:08 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/temic/sbd.c: New target.
+
+	* pmon/pci/pcivar.h: Resync with SDE-MIPS.
+
+	* pmon/pci/pciconf.c: Add ChrisD's changes for spotting and
+	ignoring bridges.
+
+	* pmon/pci/pcireg.h: Added bridge type definitions.
+
+	* pmon/nec5074/sbdreset.S: Remove Vr4100 config register
+ 	initialisation.  Don't initialise INTCS base in reginit table
+ 	(doesn't make sense here).
+
+	* pmon/nec5074/ns16550.h: Don't define nsreg or NSREG in wrong
+	mode.  Add baud rate latch definitions.
+
+	* pmon/nec5074/ns16550.c: Fix for xr16850 divide-by-four baud rate.
+
+	* pmon/nec5074/flashrom.c: Resync with SDE-MIPS.
+	* pmon/nec5074/flashrom.h: Ditto.
+	* pmon/nec5074/nvenv.c: Ditto.
+	* pmon/nec5074/pci_machdep.c: Ditto.
+	* pmon/nec5074/reginit.h: Ditto.
+	* pmon/nec5074/reginit.s: Ditto.
+	* pmon/nec5074/sbdfreq.c: Ditto.
+	* pmon/nec5074/sbdfrom.c: Ditto.
+	* pmon/nec5074/sbdfrom.h: Ditto.
+	* pmon/nec5074/sbdnvram.c: Ditto.
+	* pmon/nec5074/vrc5074.h: Ditto.
+
+	* pmon/nec41xx/vr41xxio.h: Added new Vr4121 registers.
+
+	* pmon/nec41xx/sbdreset.S: Changes from NECMON added, including
+	"optimal" refresh calculation and Vr4121 initialisation.
+
+	* pmon/nec41xx/sbd.c (sbdgetname): Name expanded to refer to UEB.
+	(getmachtype): Support Vr4121 and Vr4122.
+	(sbdpipefreq): Take chip type into account when calculating
+	pipeline clock.
+	(_sbd_tclkdiv): Take chip type into account when dtermining Pclock
+	to Tclock divisor.
+
+	* pmon/devaz/sbdreset.S: Imported from SDE-MIPS kit.
+
+	* pmon/devaz/sbdics.c: I2C interface to ICS9148 clock synthesiser.
+
+	* pmon/devaz/sbdfreq.c: Sync with SDE-MIPS and try to read SYSCLK
+	frequency from ICS9148 clock synthesiser.
+
+	* pmon/devaz/sbdbflash.c: Sync with SDE-MIPS.
+	* pmon/devaz/sbduflash.c: Ditto.
+	* pmon/devaz/sbdflashenv.c: Ditto.
+	* pmon/devaz/bflash.h: Ditto.
+	* pmon/devaz/uflash.h: Ditto.
+
+	* pmon/devaz/sbd.h: Add ICS clock and data lines to PIO.
+	Define NS16550 layout.
+	
+	* pmon/devaz/sbd.c (ConfigTable): Default to 38400 baud.
+	(getmachtype): Support other 32-bit CPUs (you never know!)
+	(sbdmachinit): Read memory size from just below exception vector.
+	(sbddbgintr): Stubbed.
+	(__time): Removed.
+
+	* pmon/devaz/ns16550.c: Latest version from pmon/nec5074.
+	* pmon/devaz/ns16550.h: Ditto.
+
+	* pmon/devaz/ics9148.h: New header for ICS9148 clock synthesiser
+	I2C interface.
+
+	* pmon/devaz/flashenv.c: Use latest SDE-MIPS version.
+	* pmon/devaz/flashenv.h: Ditto.
+	* pmon/devaz/flashrom.h: Ditto.
+	* pmon/devaz/flashrom.c: Ditto
+	* pmon/devaz/reginit.h: Ditto.
+	* pmon/devaz/reginit.s: Ditto.
+
+	* pmon/cudig/ns16550.c: Fix divide-by-four baud rate logic for
+ 	xr16850.
+
+	* pmon/TEMIC/targets.mk: New target.
+
+	* pmon/NEC5074/targets.mk: Fix comment.
+
+	* pmon/DEVAZ/LG/.gdbinit: New file.
+
+	* pmon/DEVAZ/targets.mk: Comment out NET-related stuff for now.
+	Comment out flash stuff too.
+
+	* pmon/main.c (sbdmachinfo): Define weak version for old targets. 
+
+Wed Jun  2 15:35:10 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/nec5074/ns16550.h: Move definition of NSREG inside
+	assembler ifdef.  Add NSDLL and NSDLM aliases.
+
+	* pmon/nec41xx/vr41xxio.h: Add new Vr4121 registers.
+
+	* pmon/nec41xx/sbdreset.S: Change some initialisation to match the
+	NECMON source code, in particular handle the new Vr4121.
+
+	* pmon/nec41xx/sbd.c (sbdgetname): Identify as UEB board.
+	(getmachtype): Identify Vr4122 part.
+	(sbdpipefreq, _sbd_tclkdiv): Handle different conversions for
+	different CPUs.
+	
+Thu May 13 11:50:48 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* 00-README: Updated a bit.
+
+	* pmon/nec5074/sbd.c: New board support for NEC DDB-Vrc5074
+	eval board.
+
+	* pmon/NEC5074: Ditto.
+	
+	* pmon/pci/pcireg.h: Put #ifndef __ASSEMBLER__ around typedefs.
+
+	* pmon/pci/pcidevs: Updated to latest version of database from
+	OpenBSD. 
+	* pmon/pci/pcidevs.h: Rebuilt.
+	* pmon/pci/pcidevs_data.h: Rebuilt.
+
+	* pmon/pci/pciconf.c (_pci_autoconf): Use sprintf() to construct
+ 	device name including unit number.
+	(_pci_cacheline_log2): Weak definition, defaulting to 8 words.
+	(_pci_maxburst_log2): Weak definition, defaulting to no limit.
+	(_pci_setup_devices): Set cache line size in each device's PCI
+ 	config header.
+
+	* pmon/cudig/sbd.h: Define XR16850.
+
+	* pmon/cudig/ns16550.c: Genericised XR16850 support, and updated to
+ 	use transmit FIFO.
+
+	* pmon/blm/sbdfrom.h: Define FROM_NEVER_SELF_PROGRAM.
+
+	* pmon/blm/sbd.c: Fix typos.
+
+	* pmon/blm/flashrom.c: Fixup use of <assert.h>
+
+	* pmon/mipsram.S: Flush caches after sizing cache, so that
+	uncached memory is in sync.
+
+	* pmon/main.c (cerrpoll): Avoid recursive calls, and update fifo
+	pointers before attempting to output message.
+
+	* pmon/go.c (pmexception): Don't reboot on a fatal exception until
+	after we've had a go at printing a message to the console, even if
+	curlst has not been set yet.
+
+	* net/sys/drivers/if_fe.c (fe_ioctl): Remove special case code and
+	call standard arp_ifinit() function.
+
+	* net/sys/drivers/if_devar.h (tulip_board_t): Add
+ 	TULIP_21140_NECDDB enumerator value.
+	(TULIP_BURSTSIZE): Defined from PROM version by calling
+	_pci_maxburst_log2() function.
+	
+	* net/sys/drivers/if_de.c (arp_ifinit): Removed, there is now a
+ 	version in the stack.
+	(tulip_mii_phy_attrlist): Add definition for the ICS-1890 MII on
+ 	the NEC board.
+	(tulip_mii_autonegotiate): For NEC board, set ISOLATE bit when
+	resetting MII, and add some devug messages.  Ignore old contents
+	of control register when restarting negotiation.
+	(tulip_2114x_necddb_media_preset): New function to support
+	non-EEROM configuration on NEC board.
+	(tulip_identify_necddb_nce): New function to support
+	non-EEROM configuration on NEC board.
+	(tulip_busmode): Don't enable READ MULTIPLE cycles on NEC board.
+	
+	* lib/termio.c (devinit): Allow sbd.c file to force initialisation
+	of UART by specifying a negative buffer size.
+
+Thu Apr 22 17:02:56 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/pci_machdep.c: Fixed comment typo.
+
+	* pmon/main.c: Call sbdmachinfo to print board specific
+	information for all targets.
+
+	* pmon/*/sbd.c: Added dummy sbdmachinfo() where needed.
+
+	* pmon/hurricane/sbd.c: Clock speed stored in EEPRROM is in
+	MHZ...  Set cpuspeed for delay loops.
+
+	* pmon/HURRICANE/targets.mk: Override CONVFLAGS[LB]G.
+
+Thu Apr 22 15:46:34 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/hurricane:
+	* pmon/HURRICANE:  Board support for V3 Hurricane
+
+Wed Apr 14 11:38:10 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbd.c (getmachtype): Distinguish between 5260 and
+	5261 using cache size.
+
+	* pmon/gal9/sbd.c: Fixed prid.h include. From Ralph Roesch.
+
+	* pmon/gal9/gt64011.h: Fixed GT_IPCI_CMD_ByteSwapOff definition
+	(from Ralph Roesch)
+
+Fri Apr  2 17:30:15 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/blm/z8530.h: Latest version from SDE-MIPS.
+
+	* pmon/blm/z8530.c: Work with new z8530.h file.
+	(z8program): When reprogramming, wait for shift register to
+	completely finish, not just for TXRDY.
+	
+	* pmon/blm/sbdreset.S: Always initialise watchpoint registers;
+	always initialise Config register.
+
+	* pmon/blm/sbd.h: Work with new z8530.h file.  Round CACHECYLE
+	up. 	
+
+	* pmon/blm/sbd.c: Changed UART config table to work with new
+	z8530.h file.
+	(getmachtype): Detect RM5231.
+	(probefreq): Removed.
+
+	* pmon/BLM/targets.mk: Changed download format to S3.
+
+	* pmon/gal9/sbd.c (getmachtype): Identify RM5231.
+
+	* pmon/cudig/sbd.c (getmachtype): Identify RM5231.
+
+	* pmon/regs.c (dispTlb): Taught that RC32364 has only 32 TLB
+	entries. 
+	(disp_tlbentries): Ditto.
+
+	* pmon/mipsram.S (_go): Fixed to handle R4650 floating-point.
+
+Wed Mar 31 12:01:06 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/blm/sbd.c: New directory for Siemens Atea BLM-RISC board.
+	
+	* pmon/p5064/pci_machdep.c (_pci_hwinit): Check for $PCIMAP as
+	well as $pcimap.  Initialise read-ahead fifos to "no flush", if
+	they don't have prefetch enabled.
+	(_pci_hwreinit): If an aperture is set to prefetch, then update
+	the read-ahead fifo priorities at that point.
+
+	* pmon/p4032/pci_machdep.c (_pci_hwinit): Check for $PCIMAP as
+	well as $pcimap.  Initialise read-ahead fifos to "no flush", not
+	"auto flush", since they initially don't have prefetch enabled.
+	(_pci_hwreinit): If an aperture is set to prefetch, then update
+	the read-ahead fifo priorities at that point.
+
+	* pmon/gal9/sbd.c: (getmachtype): Use mips/prid.h.
+	(sbdenable): Don't enable "fpu interrupts" (hangover from R3000
+	code). 
+
+	* pmon/cudig/sbd.c (getmachtype): Use mips/prid.h.
+	(sbdenable): Don't enable "fpu interrupts" (hangover from R3000
+	code). 
+	(sbdcpufreq): Reverse multiplier and divisor.
+	
+
+Mon Mar 29 18:04:41 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbd.c: Corrected cache size comparison for 5230/5231.
+
+	* pmon/regs.c (disp_tlbentries): Initialised ntlb so that it is
+	possible to display TLB registers for all processors.
+
+	* net/sys/drivers/if_de.c: ifdeffed out another debug message.
+
+Mon Mar 29 13:15:57 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbd.c: Added <prid.h> and use correct PRID constants.
+
+	* pmon/p4000/sbd.c: Added sbddisplay prototype.
+
+	* pmon/P4032/targets.mk: Set ITBASE to 0xbfc60000.
+
+	* net/sys/drivers/if_sonic.c: Added missing endif.
+
+	* net/sys/drivers/if_de.c: fixed 21041 autosensing for
+	devices without TP (eg P4032).  Added yet more debugging.
+
+Tue Mar 23 16:50:31 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* lib/lr30cache.S: Corrected lr33000.h path
+
+	* pmon/regs.c (in_machtype): Recognize 5231 and 5261 as R5000
+	class processors.
+
+	* pmon/p4032/pci_machdep.c (_pci_hwinit): Finally removed the
+	MAXTRIES code now that we really understand what is going on.
+
+	* pmon/p4032/sbd.c (getmachtype): Use PRID_ constants.
+	Distinguish between 5230 and 5231 by cache size.
+
+Mon Mar 22 16:26:44 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/stty.c (getbaudrate): Now a static function.
+	(parsettymode): New function which parses tty mode such as
+ 	"9600,8n1", and updates termio structure.
+
+	* pmon/load.c (load): Support tty mode string rather than simple
+ 	baud rate.
+
+	* pmon/gal9/sbdflashenv.c: Stop environment sector search based on
+ 	max sector size, not fixed 64K sector size which is too small.
+
+	* pmon/cudig/sbdreset.S: Use better tuned access time settings for
+	EPROM. 
+
+	* lib/termio.c (devinit): Changed to support tty "mode"
+ 	environment variables, rather then simple baud rate.
+
+	* include/termio.h: Added parsettymode() prototype.
+
+	* include/alloca.h: Needed for new flash code.
+
+Tue Feb 23 17:19:12 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbd.c: Made sbddisplay parameters match protototype
+	in mips.h
+
+	* lib/rm7kcache.S: status register was being trashed if tertiary
+	cache was not enabled.
+	
+Tue Feb 23 13:50:57 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Adjust latency calculations for 66MHz PCI.
+	(_pci_query_dev_func): Don't include device in bandwidth
+	calculations if its max latency is set to 0 (don't care).
+	
+	* pmon/p5064/flashenv.c (_sbd_envinit): Reset env_init_state once
+	we've reported any initial failure.
+
+	* pmon/cudig/sbd.c: Check for environment errors later.
+
+	* pmon/cudig/ns16550.c: Add support fot the XR16850 with its large
+	fifos, higher baud rates and h/w flow control.
+
+	* pmon/cudig/ns16550.h: Ditto.
+
+	* pmon/cudig/flashenv.c (_sbd_envinit): Reset env_init_state once
+	we've reported any initial failure.
+
+	* pmon/CUDIG/targets.mk: Enable ITROM.
+
+	* include/termio.h: Add Unix style parity, char size, stop bit and
+ 	h/w flow control control bits.  Add new OP_TCSET opcode to pass
+	this new information to driver.  Make encoded baud rate *100 not
+	*10 to support baud rates higher than 327680.
+	
+	* lib/termio.c: Support new control bits and OP_TCSET.
+	
+	* pmon/stty.c: Support all the new control bits.
+
+	* pmon/load.c: Add "hostbaud" option to automatically switch to
+	new baud rate for load command.
+
+	* pmon/cmdtable.c: Update option summary for "flash" command.
+
+
+Mon Feb 15 14:21:46 1999  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/cudig: new directory for Telegate board
+	* pmon/CUDIG: ditto.
+
+	* pmon/gal9/sbdflashenv.c: Don't get stuck in a loop if the top
+	sector is write protected.
+
+	* pmon/mips.S: When copying .data to ram, force KSEG1 address, as
+ 	caches may not be initialised yet!  Add "CACH" display message
+ 	before calling mips_init_cache().
+	(cliexit): Check that "gobufvalid" is set before doing longjmp,
+	else restart main(), as before.
+	
+	* pmon/go.c: Add "gobufvalid" flag, and clear it if the program
+	"stops" for any reason (e.g. exception, breakpoint, etc).
+	Otherwise the longjmp will likely crash.
+
+	* pmon/debug.c: Use the new "gobuf" setjmp facility to catch
+	program exit and return an exit message to gdb.
+
+	* lib/r5kcache.S: Synced with SDE-MIPS, including explicitly clear
+ 	taglo in several places.
+
+	* lib/rm7kcache.S: Ditto.
+
+Tue Feb  9 17:46:10 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* lib/termio.c: Fixed non-standard baud rate set from environment
+
+Wed Jan  6 14:19:37 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/main.c: Added missing parameter to __time call
+
+Tue Jan  5 14:43:50 1999  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbdreset.S: fixed the MAXREVISION test
+
+	* pmon/p4032/sbdreset.S: Preserve msize in case it is needed for
+	clearing memory.  Included memory clear from p5064/sbdreset.s.
+
+	* pmon/mips.S: fixed a comment
+
+	* net/sys/drivers/if_de.c (tulip_init): Only call tulip_reset if
+	media probe is inactive.
+
+Mon Dec 28 12:53:29 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/nec41xx: New board support for NEC Vr41xx universal eval
+	board. 
+
+	* pmon/subsys.mk: Explicitly use "sh" to run newversion script.
+
+	* pmon/regs.c (in_machtype): Add checks for Vr41xx family.
+	(dispTlb): Use in_machtype(F_4100) to check for Vr41xx TLB.
+	(disp_tlbentries): Ditto.
+	
+	* pmon/regdefs.c: Add "CS" field to Config register for Vr41xx.
+	Add CAlg register for R4650.  Add Perr register for Vr41xx.
+
+	* pmon/pmon.h: Optimise SBD_DISPLAY(). Reorganise RegList flags to
+	make it simpler to add new CPUs.
+
+	* pmon/mipsram.S (enableCU1): Add code to check for Vr41xx.
+
+	* pmon/main.c (autorun): In autoboot use __time() function if RTC
+ 	or INET is defined.
+
+	* pmon/debug.c (readc): Use proper timer if RTC or INET is defined.
+
+	* net/sys/netinet/if_ether.c (arp_ifinit): New common function for
+	announcing interface.
+
+	* net/sys/netinet/if_ether.h: Define arp_ifinit prototype.
+
+	* net/sys/net/if_ethersubr.c (ether_attach): New function to do
+	common work of attaching an ethernet interface.
+
+	* net/sys/net/if.c (if_newaddr): New function to record
+	interface's ethernet address.
+
+	* net/sys/kern/kern_glue.c (bcopy): Remove it, we've got a version in
+	the PMON library, and having this here too can cause the
+	networking library to be dragged in when we don't want it.
+
+	* net/sys/drivers/if_ne.c: New NE2000 driver.
+
+	* net/sys/drivers/if_de.c: Use ether_attach() to ensure ethernet
+	address is recorded.
+
+	* net/sys/drivers/if_fe.c: Ditto.
+
+	* net/sys/drivers/if_sonic.c: Ditto.
+
+	* net/sys/drivers/if_xdssonic.c: Ditto.
+
+	* net/cmd/bootp.c: Dynamically search for driver's ethernet
+	address, rather than using "sbdgetethaddr", which may not exist or
+	apply.
+
+	* lib/R4000/targets.mk: Add -Acache(r4k) -Acache(r5k)
+	-Acache(rm7k) and -Acache(r5400)
+
+	* lib/R4000mips2/targets.mk: Ditto
+
+	* lib/R3000/targets.mk: Add -Acache(r3k)
+
+	* lib/LR33K/targets.mk: Add -Acache(lr30)
+
+	* lib/termio.c (devinit): Quietly skip tty entries which failed to
+	initialise.
+
+	* lib/files.mk: Include new cache modules from SDE-MIPS
+
+	* lib/rm7kcache.S: Updated RM7000 cache module from SDE-MIPS
+	
+	* lib/r5kcache.S: Updated R5000 cache module from SDE-MIPS
+
+	* lib/r54cache.S: New Vr5400 cache module from SDE-MIPS
+
+	* lib/r4kcache.S: Updated R4000 cache module from SDE-MIPS
+
+	* lib/r3kcache.S: New R3000 cache module from SDE-MIPS
+
+	* lib/lr30cache.S: New LSI LR33K cache module from SDE-MIPS
+
+	* lib/cwcache.S: New LSI CW cache module from SDE-MIPS
+
+	* lib/cache.S: New cache switching module from SDE-MIPS
+
+	* include/mips/r4kc0.h: Fix CFG_EW32 definition.  Add other
+	changes from SDE-MIPS.
+
+	* include/mips/prid.h: Add RC6447X
+
+	* Makefile: Make TARGETS default to "BG LG" not just BG, so that
+	we rebuild LG libraries.
+	
+Mon Nov 30 11:13:38 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbdreset.S: Activate the PS/2 mouse.
+
+	* pmon/p4032/sbd.c: Recognise 64474 processor.
+
+Wed Oct 28 14:35:58 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pcivar.h (_pci_hwinit): Now has int return value.
+
+	* pmon/pci/pciconf.c (_pci_configure): Always call _pci_hwinit(),
+	but if it returns -1 give up immediately, and if it returns 0 then
+	don't initialise config space, just scan it.
+
+	* pmon/glacier/pci_machdep.c (_pci_hwinit): Now returns -1 for
+ 	error, 0/1 for OK.
+
+	* pmon/p4032/pci_machdep.c (_pci_hwinit): Ditto.
+
+	* pmon/p5064/pci_machdep.c (_pci_hwinit): Ditto.
+
+	* pmon/gal9/sbdpci.c (_pci_hwinit): Check $pcimaster and $pcislave
+	env variables - $pcislave says don't initialise PCI config space,
+	just scan it.  Now returns 1 if higher level code should
+	initialise config space, -1 for error, 0 otherwise.
+	(_pci_conf_read): Added checking for master and target abort.
+	(_pci_conf_write): Ditto.
+
+	* pmon/gal9/sbdnet.c (eninit): Don't check $pcimaster env variable
+ 	here any more, it's done as part of sbdpci.c now.
+
+	* pmon/gal9/gt64011.h: Added interrupt cause & mask definitions
+	for Galileo chip.
+
+	* pmon/gal9/flashenv.c (env_structcheck): Check end of environment
+	is blank 128 bytes at a time to speed up.
+
+	* pmon/GAL9/targets.mk: Bump data start address to leave from for
+	R4650/RM5230 debug vector.  Added ITBASE=0xbfc68000 now that we
+	have ported ITROM to this board.
+
+	* pmon/mips.S: Mark entrypoints with .ent, so that sde-objdump can
+	disassemble them correctly.
+
+	* lib/r5kcache.S: Added comment.
+
+Fri Oct 23 13:24:21 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/go.c: switch back to PMON terminal state after client
+	exits. 
+
+	* net/cmd/bootp.c: transacion ID (bp_xid) is in network order, so
+	use ntohl when checking it against the expected value.
+
+Wed Oct 14 14:30:53 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/go.c (go): Do a setjmp before calling goclient.
+
+	* pmon/mips.S (cliexit): Call longjmp after client exits.
+	These modifications allow a command line using ';' to run
+	additional commands after a 'g'.
+
+Mon Oct  6 15:12:55 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/sbd.c (getmachtype): Use symbolic PrID values, and
+	add RM7000 and R5400 to switch.
+
+	* pmon/regs.c (in_machtype): Add RM7000 and R5400 to list.
+
+	* pmon/regdefs.c (Cfg[]): Define RM7000 specific fields.
+
+	* pmon/pmon.h: (struct Reglist and Regspec): Increase size of
+	flags to 24-bits.  Define F_7000 and F_5400 flag bits.
+	
+	* pmon/main.c: Split mips_pcache_ways into mips_icache_ways and
+	mips_dcache_ways. Make cache size reporting use a consistent
+	format. 
+
+	* lib/target.mk: Add -DIN_PMON to compile flags.
+
+	* lib/rm7kcache.S: New RM7000 cache handling.
+
+	* lib/r5kcache.S: IN_PMON now defined outside of here.
+	Split mips_pcache_ways into mips_icache_ways and mips_dcache_ways,
+	as per SDE-MIPS.
+	Renamed all functions to r5k_xxx, SDE-MIPS kit will follow this.
+	(cacheop): Use hard-wired line size, as it is fixed for all R5000 class
+	cpus. 
+	(_size_cache): Don't return line sizes, but do compute valid
+	scache tag bits.
+	(r5k_size_cache): Always store the line sizes and cache set
+	sizes in the global variables.
+	(r5k_init_cache): Use hardwired line sizes.
+	(r5k_clean_dcache_nowrite): Don't flush scache.
+
+	* lib/r4kcache.S: IN_PMON now defined outside of here.
+	(mips_clean_icache): Muse writeback and invalidate dirty data
+ 	lines in scache if scache is NOT split.
+
+	* lib/cflu.S: Added RM7000 switch; automated function building
+	with a macro.
+
+	* lib/files.mk: Added rm7kcache.sx
+
+	* include/mips/rm7kc0.h: New RM7000 header file.
+
+	* include/mips/r5kc0.h: Correct TagLo secondary tag bits as per
+	R5000 spec - the RM52xx version is wrong.  Add CacheErr register
+	fields.
+
+	* include/mips/prid.h: Added Vr5400.
+
+Mon Oct  5 18:12:55 1998  Nigel Stephens  <nigel@algor.co.uk>
+	
+	Checked in for Chris.
+	
+	* pmon/p5064/sbdreset.S: Limit board revision number to max 3.
+
+	* lib/r4kcache.S: Split mips_pcache_ways into mips_icache_ways and
+	mips_dcache_ways, as per SDE-MIPS.
+
+Wed Sep 23 11:36:58 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/sbd.h: Fix new PCI i/o space address.
+
+	* pmon/p4032/pci_machdep.c (_pci_hwinit): Fix parentheses in
+	conditional.
+	(_pci_conf_read): Include register number in type 1 config cycles.
+	(_pci_conf_write): Ditto.
+
+	* pmon/p5064/pci_machdep.c (_pci_conf_read): Include register
+ 	number in type 1 config cycles.
+	(_pci_conf_write): Ditto.
+
+Mon Sep 21 15:17:51 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/kern/kern_sig.c: Don't deliver signals until the process
+	stuff has been set up (seen when wince sends ^C to tty1 while PMON
+	is rebooting)
+
+Mon Sep 21 00:49:20 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Only perform bus bandwidth calculations when
+	the bus is being initialised; otherwise an "out of bandwidth"
+	message is printed because all of the grant and latency registers
+	have been adjusted.
+
+	* net/cmd/tftplib.c: TFTP tracing can be enabled by setting
+	tftptrace environment variable.
+
+	* net/cmd/boot.c: Added WinCE binary loader
+
+Thu Sep 17 00:10:49 1998  Chris Dearman <chris@algor.co.uk>
+	* pmon/p5064/sbdreset.S: Use pio.h header file.
+
+	* net/sys/drivers/if_devar.h: Added padding around descriptors to
+	avoid problems with adjacent cachelines.
+
+Mon Sep 14 15:34:30 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_setup_memwins): Fix typo.
+
+	* net/cmd/boot.c (load_xx): Add prototype for strnchr().
+
+Mon Sep 14 14:35:41 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/gal9/sbdpci.c (_pci_allocate_mem): Allocate memory space
+ 	from top down and leave space at bottom for pseudo ISA region.
+	(_pci_allocate_io): Ditto for i/o space.
+        (_pci_map_mem): Add special case for mapping expansion ROM.
+
+	* pmon/p4032/pci_machdep.c (_pci_hwinit): Read revision register
+ 	when not initialising.
+	(_pci_allocate_mem): Allocate memory space from top down and leave
+ 	space at bottom for pseudo ISA region.
+	(_pci_allocate_io): Ditto for i/o space.
+        (_pci_map_mem): Add special case for mapping expansion ROM.
+	
+	* pmon/p5064/pci_machdep.c (_pci_map_mem): Add special case for
+	mapping expansion ROM.
+
+	* pmon/pci/pciconf.c (_pci_query_dev_func): use symbolic names for
+	expansion ROM base register.
+
+	* pmon/pci/pcireg.h: Added expansion ROM base register definitions.
+
+Mon Sep 14 12:09:41 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_query_dev_func): Add initialise
+	argument, and if set don't bother scanning base registers; they've
+	already been set up and we don't want to change them.  Finally add
+	test for expansion rom register and allocate a memory region for it.
+	(_pci_query_dev): Add initialise argument and pass through to
+	_pci_query_dev_func.
+	(_pci_setup_iowins): Set device's mem & io window count to -1 if
+	we fail to allocate space for it, to distinguish between failure
+	and no windows requested.
+	(_pci_setup_memwins): Ditto.  Plus handle special case when
+	programming expansion rom base register.
+	(_pci_setup_devices): Always enable i/o & mem accesses in the
+	command/status register, in case this is a device which snarfs
+	ISA space and doesn't have any explicit PCI windows (e.g. VGA).
+	(_pci_configure): Pass initialise argument to _pci_query_dev.
+	
+Fri Sep 11 17:00:11 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_query_dev_func): Save and restore base
+	registers when scanning.  
+	(_pci_configure): Pass initialise argument to _pci_setup_devices.
+
+	* pmon/p4032/sbdnet.c (eninit): Don't bother initialising
+	_pci_verbose, this is now done in generic pciconf file.
+	Pass !pmon_in_ram as initialise parameter to _pci_configure.
+
+	* pmon/p5064/sbdnet.c (eninit): Don't bother initialising
+	_pci_verbose, this is now done in generic pciconf file.
+	Pass !pmon_in_ram as initialise parameter to _pci_configure.
+
+	* pmon/p4032/pci_machdep.c: Bring into sync with SDE kit
+	version. Add v96x_bswap variable to decide when we need to byte
+	swap data.
+	(_pci_hwinit): If not initialising, set v96x_bswap based on current
+	swap settings in LB_BASE0 register; else set based on our
+	configuration. 
+	(_pci_hwreinit): Allow PCI devices to prefetch from our memory,
+	even if not all of them support prefetch.
+	(_pci_conf_read): Use pci_tagprintf for diagnostics.  Swap read
+	data only if v96x_bswap is set.
+	(_pci_conf_write): Ditto.
+	(_pci_map_io): Renamed from pci_map_io and filled in.
+	(_pci_map_mem): Use pci_tagprintf for diagnostics.
+	(_pci_map_int): Ditto.
+	
+	* pmon/p5064/pci_machdep.c: Removed unused byte-swap macros.
+	(_pci_hwinit): Clear PCI interrupts and enable V3 interrupts.
+	(_pci_hwreinit): Removed redundant setting of max bus latency.
+
+Fri Sep 11 12:47:11 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c (_pci_setup_iowins): If machdep fails to
+	allocate i/o space, then disable card by setting both nmemwin and
+	niowin to zero.  Also print generic error message.
+	(_pci_setup_memwins): Ditto for memory space.
+	(_pci_setup_devices): Don't call autoconf routine for a card if it
+	has no memory and no i/o.
+	
+	* pmon/p5064/pci_machdep.c: Minor text layout changes to make
+ 	address ranges easier to read.
+	(_pci_allocate_mem): Don't print error message, now done by
+	generic code in pciconf.c.
+	(_pci_allocate_io): Ditto.
+
+	* pmon/p4032/pci_machdep.c (_pci_allocate_mem): Don't panic,
+ 	just return -1.
+	(_pci_allocate_io): Ditto.
+	
+Fri Sep 11 00:59:05 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Enable I/O accesses for VGA cards!
+
+	* pmon/p4032/w83777f.h: Added missing CR17 definition
+
+	* pmon/p4032/sbdreset.S: Initialise conbfig register if ITROM is
+	not run.
+
+	* pmon/p4032/pci_machdep.c: More RevC/SDE inspired updates.
+
+	* pmon/P4032/targets.mk: Removed obsolete CONVFLAG.  Added
+	CONVFLAGLG and CONVFLAGBG.
+
+	* net/sys/drivers/if_de.c: Fixed the P4032 onboard device ID so
+	the driver knows when to fake the SROM contents.
+
+Thu Sep 10 17:13:10 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Handle error returns from _pci_allocate_xxx
+	better. 
+
+	* pmon/p5064/pci_machdep.c: Allocate PCI mem & i/o space downwards
+	from the top of each region, so as to handle very large regions
+	now that the bottom xMB of each region is reserved for ISA.
+
+Thu Sep 10 12:23:39 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/centronics.c: Enable totem-poll output on Centronics
+	IRQ output (i.e. not open-drain).
+
+	* pmon/subsys.mk: Minor comment change.
+
+Wed Aug 19 13:39:13 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/drivers/if_de.c: The end-of-ring marker was gettig
+	trashed during a reset...
+
+Tue Aug 18 16:20:07 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/loadfn.c: Added missing comma in messages array.
+
+	* net/sys/drivers/if_de.c: Fixed bigendian support (it was the
+	stupid setup packet again).
+
+Tue Aug 18 11:38:26 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/gal9/sbdflashenv.c: Look for FLASH at FLASH_BASE and
+	BOOTROM_BASE.
+
+	* pmon/GAL9/targets.mk: Override CONVFLAG{LG,BG}
+
+	* pmon/commands.c(flashprogram): Call sbd_flashinfo to check that
+	the flash is there and to intitialisae the global variables that
+	sbd_flashprogram may rely on.
+
+	* net/sys/drivers/dc21040reg.h: non-functional big-endian hacks
+	which may well have broken little-endian as well
+
+	* net/sys/drivers/if_devar.h: Ditto
+
+	* net/sys/drivers/if_de.c: Ditto
+
+	* net/sys/R3000/LG: 
+
+	* net/cmd/boot.c: Cope with hex files where the first line is
+	shorter than a COFF/ELF header (thankyou Microsoft!)
+
+	* include/mips.h: formatting change
+
+Thu Aug 13 17:48:11 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* include/mips.h: Make sure LANGUAGE_C is defined for C files.
+
+	* pmon/gal9/sbdfrom.c: Make sure write buffer is flushed when
+	resetting the flash.  Poll the sector that is being erased rather
+	than the base of the flash during a sector erase command.
+
+Fri Jul 24 00:29:32 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/pci_machdep.c: u_int -> unsigned int in _pci_cpumap
+	and _pci_dmamap.  Corrected _pci_dmamap parameter usage.
+
+	* pmon/gal9/sde-compat.h: size_t now appears in stddef.h
+
+	* pmon/gal9/sbdreset.S: Removed junk #else/#endif pair
+
+	* pmon/gal9/sbdpci.c: Added _pci_cpumap and _pci_dmamap
+	functions.  Use initialise parameter in _pci_hwinit
+
+	* pmon/GAL9/targets.mk: Added LG to the default target.  GAL9
+	targets now build, but are still untested.
+
+Thu Jul 23 12:15:41 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/v96xpbc.h: Added "Rev C.0" comment to new fifo mode.
+
+	* pmon/p5064/pci_machdep.c (_pci_hwinit): Define new PCI->Local
+ 	memory space mappings which leave space for ISA memory, but use
+ 	old mappings if $pcimap=old.  Move non-ISA PCI i/o devices to the
+ 	top 512MB of the i/o region, so that hardware can distinguish
+ 	between ISA and other i/o cycles.  Remove never properly supported
+ 	$pcimembase env variable. Removed ifdefed out left-overs.  Enable
+ 	prefetch on both PCI->Local memory regions, unless $pcimap=old, in
+ 	which case the C0000000 mapping stays non-prefetchable.
+	(_pci_dmamap): New function to map local memory address to PCI
+ 	memory space address.
+	(_pci_cpumap): Inverse of _pci_dmamap.
+	(_isa_dmamap): New function to map local memory address to ISA
+ 	memory space address.
+	(_isa_cpumap): Inverse of _isa_dmamap.
+	
+	* pmon/p4032/v96xpbc.h: Merged recent changes from P5064.
+	
+	* pmon/p4032/pci_machdep.c (_pci_hwinit): Removed never properly
+ 	supported $pcimembase and $pciiobase env variables.  Support new
+ 	"initialise" argument. Set fifos to write priority, and use Rev
+ 	C.0 end-of-burst readahead flush if possible.  Remove ifdefed out
+ 	leftovers.
+	(_pci_flush): New function to manually flush readahead fifos on
+ 	non Rev C.0 parts.
+	(_pci_dmamap): New function to map local memory address to PCI
+ 	memory space address.
+	(_pci_cpumap): Inverse of _pci_dmamap.
+
+	* net/sys/drivers/if_devar.h: Define TULIP_KVATOPHYS to call
+	_pci_dmamap() for PMON.
+
+	* net/sys/drivers/if_de.c (vtophys): Comment out for PMON, to
+	make sure that we don't get any calls to it.
+	
+
+Wed Jul 15 16:26:38 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Call _pci_hwinit with the initialise
+	parameter (which will always be 1).
+
+	* pmon/pci/pcivar.h: Updated _pci_hwinit prototype, which will
+	break other PCI ports (eg P4032, GAL9) in due course...
+
+	* pmon/p5064/v96xpbc.h: Added a couple of RevC values and fixed
+	V96X_LB_CFG_LB_INT.
+
+	* pmon/p5064/sbdreset.S: Linebreaks cause assembler to barf.
+
+	* pmon/p5064/pci_machdep.c: merged SDE changes:
+	pci_conf_{read,write}{8,16,32}, error handling and initialisation.
+	They are almost identical again...
+
+Tue Jul 14 12:08:05 1998  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/v96xpbc.h: Add new "flush at end of burst" read fifo
+	option.
+
+	* pmon/p5064/sbdreset.S (reginittab): Set ISA bridge top-of-memory
+	register (TOM) to 16MB so that ISA dma accesses below this address
+	are forwarded to PCI (except for the 640K-1M hole, of course).
+
+	* pmon/p5064/pci_machdep.c (_pci_hwinit): Ifdef out initialisation
+	of PCI->local aperture 0 (c0000000) in preparation for it
+	disappearing! Set fifo priorities to be fully safe and coherent
+	(use new "flush at end of burst" setting on Rev C.0 and above).
+	Enable PCMCIA device when enabling other onboard devices.
+	(pci_flush): New function to flush readahead fifos on Rev B.2 and
+	below. 
+	
+Thu Jul  9 21:11:33 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbdreset.S: Don't use s7 as a temporary - mips.S uses
+	it to decide whether PMON is running from ROM.
+
+	* pmon/p5064/sbd.h: fiddled with the ICU definitions.
+
+	* pmon/p5064/sbd.c: Removed MII ICU register because it has
+	disappeared again.
+
+	* net/sys/drivers/if_de.c: disable TULIP_DEBUG
+	
+Thu Jul  9 01:14:25 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/drivers/if_de.c (tulip_ifioctl): actually set the
+	interface address - we were neglecting to do it before which led
+	to all that ARP table confusion.
+
+Wed Jul  8 22:27:31 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pcidevs: Added 21143
+
+	* pmon/pci/pcidevs_data.h: updated from pcidevs
+
+	* pmon/pci/pcidevs.h: updated from pcidevs
+
+	* pmon/p5064/sbdreset.S: Program the config register etc if ITBASE
+	is defined bu not there.  Set parallel port interrupt mode.
+
+	* pmon/p5064/sbdfrom.c: Quick hack to make sure FLASH reset
+	command has time to take effect before the FLASH is read again.
+
+	* pmon/p5064/sbd.h: New ICU definitions (from SDE)
+
+	* pmon/p5064/sbd.c: Use new ICU definitions.  Use APC function on
+	RevC to turn off power.
+
+	* pmon/p5064/rtc.h: Added PC97307 specific registers.
+
+	* pmon/p5064/rtc.c: Support extended NVRAM entries on RevC.  Added
+	APC functions.
+
+	* pmon/p5064/pci_machdep.c: Set V3 burst length to 16 (Rick
+	assures me this will work with older boards...).  Use new ICU
+	constants.
+
+	* pmon/p5064/isapnpreg.h: Enumerate the ISA IRQ PnP registers
+
+	* pmon/p5064/centronics.c: Use new ICU constants
+
+	* pmon/P5064/targets.mk: Reenabled ITBASE
+
+	* pmon/mips.S: Fixed the prestart stuff for PMON compiled to
+	expect ITROM, but no ITROM present.
+
+	* pmon/loadfn.h: [Nigel] Added I/O error counter.
+
+	* pmon/loadfn.c: [Nigel] Ditto
+
+	* pmon/load.c: [Nigel] don't lockout network during a network
+	download!  Maintain I/O error counter.
+
+	* net/sys/drivers/if_de.c: Removed many debug messages and
+	disabled TULIP_DEBUG.  Clear isolate and powerdown bits in phy.
+
+	* net/sys/drivers/dc21040reg.h: Corrected TULIP_21143_SIAGEN_IN0
+	definition.  Added Additional PHYCTL_ register bits.
+
+	* net/cmd/udptty.c: [Nigel] Added comments. Allow uttyread to
+	return a partial read.
+
+Tue Jun 30 05:00:24 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/drivers/if_de.c: Various tweaks.  AUI interface on 21041
+	and 21143 now works.  SROM information to drive PHY on 21143 is
+	now there.  It just needs to be tested...
+
+	* net/sys/drivers/dc21040reg.h: Added 21143 SIAGEN bits
+
+Mon Jun 29 10:20:48 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbdreset.S: Patch parallel port address 
+
+	* net/sys/drivers/if_de.c: upgraded from OpenBSD-current
+
+	* net/sys/drivers/dc21040reg.h: Ditto
+
+Sun Jun 28 00:31:27 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/drivers/if_fe.c: Added INSB & OUTSB macros.  Fixed OUTSW
+	macro.
+
+Fri Jun 26 11:59:09 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbdreset.S: Added RevC support.  Use new register
+	initialisation routines.
+
+	* pmon/p5064/sbd.h: fixed {CACHE,RAM,ROM}NS macros. Added RevC
+	changes and general tidy up
+
+	* pmon/p5064/sbd.c: display board revision as a letter
+
+	* pmon/mips.S: Removed assembler warnings and 4650 support for R3K
+	targets.
+
+	* net/sys/machine/ansi.h: from SDE-MIPS
+
+Mon Jun 22 11:25:26 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* net/sys/machine/stdarg.h: Use stdarg.h from SDE
+
+	* pmon/p5064/sde-compat.h: Removed size_t definition (it's in
+	stddef.h now)
+
+	* pmon/p5064/sbdreset.S: Tweaked sbddelay to cope with the case
+	when the cache has been disabled (eg after a cache exception)
+
+	* pmon/p5064/sbdfrom.c: Add stddef.h for for size_t type
+
+	* pmon/p5064/centronics.c: Only tweak the Winbond settings if the
+	chip is there.
+
+	* pmon/gal9/sbdreset.S: Added some big-endian fixes from Ralf Rosch
+
+	* pmon/mips.S: Only jump at ITBASE if it looks like there is
+	something there to execute.
+
+Wed Jun 17 01:23:22 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c:  Use stdarg.h
+	
+	* pmon/pci/pcivar.h:  Remove definition of size_t (use stddef.h
+	instead)
+	
+	* net/sys/netinet/if_ether.h: Use ETHER_ADDR_LEN for ethernet
+	address length.
+
+	* net/sys/kern/kern_descrip.c: Defined argument structures within
+	SYSCALL routines to prevent compiler warning.
+
+	* net/sys/kern/uipc_syscalls.c: 
+	
+
+	* net/sys/kern/sys_generic.c: 
+
+	* net/sys/kern/kern_time.c: 
+
+
+	* net/libc/getservent.c: Defeated "const" warning
+
+	* lib/stdio.c: Removed varargs.h
+
+	* lib/fread.c: Updated parameter types to match prototype.
+	
+	* lib/fwrite.c: Ditto
+
+	* lib/fprintf.c: Use stdarg.h
+	* lib/printf.c:
+	* lib/scanf.c:
+	* lib/vfprintf.c: 
+	* lib/vsprintf.c: 
+	* net/sys/kern/kern_time.c: 
+	
+
+	* lib/cp2supp.S: Added NOOP after ctc2 to keep assembler quiet.
+
+	* include/varargs.h: Removed - use stdarg,h instead
+
+	* include/stdio.h: Use stdarg.h instead of varargs.h.  Updated
+	some prototypes to match Posix(?) standards.
+
+	* include/stdarg.h: New file from SDE-MIPS
+
+	* include/stddef.h: Ditto
+
+	* include/mips/ansi.h: Ditto
+
+	* include/mips/stdarg.h: Ditto
+
+	* include/mips.h: Cope with LANGUAGE_ASSEMBLY being defined by the
+	preprocessor.
+
+Wed May 20 14:43:46 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/gal9/flashenv.c: Tidy ups...
+
+	* pmon/gal9/sbdfrom.c: Ditto
+
+	* net/sys/drivers/if_de.c: Only print the "reprogrammed by client"
+	message once.
+
+Thu Apr 16 17:17:40 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/gal9/sbdfrom.c: 
+	* pmon/gal9/sbdflashenv.c: 
+	* pmon/gal9/from.h: 
+	* pmon/gal9/flashenv.h: 
+	* pmon/gal9/flashenv.c: 
+	* pmon/gal9/flashdev.h: 
+	* pmon/gal9/flash.c: Import of SDE code
+
+	* pmon/gal9/sbdpci.c: Delete invalid pcimaster settings from environment
+
+Mon Mar 30 16:08:40 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* lib/termio.c: When initialising devices, set the default
+	baudrate before setting the user selected value in case anything
+	goes wrong.
+
+Wed Mar 18 15:26:19 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Print slot probe information if _pciverbose
+	>= 2
+
+	* pmon/pci/pcidevs_data.h: 
+	* pmon/pci/pcidevs.h: 
+	* pmon/pci/pcidevs: Added Galileo GT64011
+
+	* pmon/gal9/sbdpci.c: Handle "pcimaster" environment variable
+
+	* pmon/gal9/sbdnet.c: Only initialise PCI bus if "pcimaster" is set
+
+	* pmon/gal9/sbdflash.c: Use mips_ cache routines instead of r4k_ ones
+
+	* pmon/gal9/sbd.c: Removed timer calibration debug messages
+
+	* pmon/GAL9/targets.mk: Don't build pmon because it won't run cached...
+
+	* net/cmd/ifconfig.c: If the SIOCAIFADDR ioctl fails, print a more
+	informative message: "No network interface available"
+
+Tue Jan 13 15:40:46 1998  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/cogent/sbdreset.S:  Hacked around to compile with current sources
+	* pmon/cogent/sbdnet.c: UNTESTED!
+	* pmon/cogent/sbd.c:
+	
+	* pmon/mips.S: Added 4650 fp save/restore for none mips3 case 
+
+Wed Nov 26 20:48:39 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pcidevs.c: Don't include class/subclass in ID string
+	unless the devices are unrecognised.
+
+	* pmon/pci/pcidevs: Shortened DEC descriptions.
+
+	* pmon/p5064/sbd.h: Added definitions for option register and FPGA
+	revision register.
+
+	* pmon/p5064/sbd.c: Use scache size to distinguish between
+	5260/5270.  sbdmachinfo prints board revision, FPGA revision and
+	option switches.  sbd_off turns the board off...
+
+	* pmon/main.c: Added P5064 to list of supported ports.  Call
+	sbdmachinfo as part of the PMON sign on (only for P5064 at the
+	moment)
+
+	* pmon/cmdtable.c: Added 'off' command for P5064
+
+Thu Oct 16 02:15:35 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Corrected alternate varargs usage. 
+
+	* pmon/p5064/sbdreset.S: Reordered initialisation slightly.
+	Include huge delay while V3 attempts to read the I2C EEROM.
+
+	* pmon/p5064/sbd.h: Latest cycle time estimates
+
+	* pmon/regs.c: Added 5260/5270 to R5000 group.
+
+	* pmon/main.c: Fixed scache ways message.
+
+	* lib/r5kcache.S: Force secondary cache data initialisation from
+	ROM (probably unnecessary).  Initialise mips_pcache_ways correctly.
+
+Thu Oct  9 23:48:30 1997  Chris Dearman  <chris@algor.co.uk>
+	* pmon: Updated most of the other board dependent code so that
+	at least the various PMONs build.  One day we will have to test
+	them all again... 
+
+	* pmon/xds/sbd.c: Added sbdpipefreq()
+
+	* pmon/gal9/sde-compat.h:  Removed SDE-MIPS cache compatibility
+	defines
+
+	* pmon/cogent/sbdnet.c: Changed u_char -> unsigned char
+
+	* pmon/cogent/sbd.c: Fixed SBD_DISPLAY usage
+
+	* pmon/axon2/sbd.c: Updated flash stubs
+	* pmon/cirrms/sbd.c:
+
+	* pmon/algvme/sbd.c: Added new display handling (from P4032)
+
+	* net/sys/drivers/if_sonic.c: Use new R4K/R5K cache routines
+	* net/sys/drivers/if_xdssonic.c: 
+	* pmon/gal9/sbdreset.S: 
+	* pmon/algvme/sbdreset.S: 
+	* pmon/p4000/sbd.c: 
+	* pmon/p4000/sbdreset.S: 
+	* pmon/p4032/sbdflash.c: 
+	* pmon/p4032/sbdreset.S: 
+
+Wed Oct  8 10:38:21 1997  Chris Dearman  <chris@algor.co.uk>
+	* pmon: This is an interim checkin with the new R4000/R5000 cache
+	support.  The only target known to (sort of) work is the P5064.
+	Others will follow shortly :-)
+	
+	* pmon/p5064/sde-compat.h: Removed SDE-MIPS cache compatibility
+	defines
+
+	* pmon/p5064/sbdreset.S: Use new R4K/R5K cache routines
+
+	* pmon/mipsram.S: Use new R4K/R5K cache routines
+
+	* pmon/mips.S: Use new R4K/R5K cache routines
+
+	* pmon/main.c: Updated cache size report
+
+	* pmon/commands.c: Use new R4K/R5K cache routines.  Fixed word
+	aligned fill.
+
+	* net/sys/drivers/if_de.c: Use new R4K/R5K cache routines
+
+	* lib/LR33K/rules.mk: Fixed memcpy rule
+
+	* lib/strcmp.S: Added .set nowarn 
+
+	* lib/files.mk: Added new cache R4K/R5K cache routines 
+
+	* lib/cflu.S: SDE-MIPS cache routines (new)
+	* lib/r5kcache.S: 
+	* lib/r4kcache.S: 
+
+	* include/mips/asm.h: SDE-MIPS compatibility header files (new)
+	* include/mips/regdef.h: 
+	* include/mips/r5kc0.h: 
+	* include/mips/r4kc0.h: 
+	* include/mips/prid.h: 
+
+Mon Oct  6 16:47:20 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/pci_machdep.c: Prototyped rest of functions.
+
+	* pmon/p4032/sbdreset.S: Fixed memory sizer for 64Mb memory.
+
+	* pmon/p4032/sbd.c: Fix the 4100 calculation.
+
+Fri Oct  3 14:01:44 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/i82371sb.h: Added MBDMA fields
+
+	* pmon/p4032/v96xpbc.h: Updated to latest version
+
+	* pmon/p4032/rtc.c: Y2k compliance :) Rollover the century field
+	if it was 19 and the current year is < 70
+
+	* pmon/p5064/rtc.c: Ditto
+
+	* pmon/p4032/pci_machdep.c: Don't try to empty the FIFOs while the
+	PCI bus is reset...
+
+	* pmon/p5064/pci_machdep.c: Ditto
+
+	* pmon/p5064/sbd.c: Check to see if debug card is plugged in
+	before using the serial port.  This has the unpleasant side effect
+	of changing the tty names.  Maybe there should be a "console"
+	driver.
+
+Tue Sep 16 22:04:02 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/algcommon/sbdnet.c: Corrected frequency calculation for
+	R4x00 targets.
+
+	* pmon/target.mk: Hacked in pmonitrom.s3 rule.  It really is a
+	hack because it relies on a valid itromhi file to be lying around.
+
+	* net/cmd/boot.c: Print a meaningful message if an ELF file is
+	incorrect for some reason (eg it is the wrong endianess).
+
+Fri Sep 12 17:15:41 1997  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/sbdfrom.c: Merged changes from SDE kit.
+
+	* pmon/p5064/sbdreset.S: Minor formatting changes.
+
+	* pmon/p5064/rtc.h: Comment change.
+
+	* pmon/p5064/i8254.h: Comment change.
+
+	* pmon/p5064/centronics.c: Add initialisation of IRQ output
+	driver.
+
+	* pmon/p5064/w83777f.h: Add LPT IRQ output control.
+
+	* pmon/laserfold/sbdreset.S: Remove sbddelay() and add mips_cycle().
+	
+	* pmon/laserfold/sbd.c Calculate CPU pipeline frequency properly
+	and use it in sbddelay()
+
+	* pmon/laserfold/g10.h: Changed CACHEUS etc to CACHEUS()
+
+	* pmon/regs.c: Fix tlb dump formatting, and add asid.
+
+	* pmon/main.c: Don't use SR_FR on R3000.
+	
+Fri Sep 12 15:41:46 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p5064/sbdfrom.c: Bigendian writability test was failing due to
+	byte swapping.
+
+	* pmon/P5064/targets.mk: Set CONVFLAG{LG,BG} for P5064 builds
+
+	* pmon/subsys.mk: Set CONVFLAG to CONVFLAG{BG,LG} as appropriate
+
+	* include/mips.h: Additional primary cache modes
+
+	* defines.mk: Added defaults for CONVFLAG{BG,LG}
+
+Mon Sep  8 18:01:00 1997  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/sbdfrom.c: Attempt to do the right thing when running
+	big-endian, and programming little-endian code!
+
+	* pmon/p5064/flashdev.h: Identify code endianness when reading,
+	too. 
+
+Mon Sep  8 16:15:56 1997  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/z80pio.h: Add new PIO bit to control SIMM EEPROM
+	direction.
+
+	* pmon/p5064/sbdreset.S: Use new PIO bit.
+
+	* pmon/p5064/sbd.h: Add PROGRAM_OFFSET to access new flash
+ 	programming window.
+
+	* pmon/p5064/flashdev.h: Working version of new flash code.
+
+	* pmon/p5064/from.h: Ditto.
+	
+	* pmon/p5064/sbdfrom.c: Ditto.
+
+	* pmon/p5064/flashenv.h: Working version of new flash environment
+	code. 
+
+	* pmon/p5064/sbdflashenv.c: Board-specific flash environment code.
+
+	* pmon/p5064/flash.c: Add new "big endian" parameter.  Interpret
+	error result from programming routines.  Don't load whole of flash
+	into memory, instead use the low-level "merge" facility of the new
+	flash programming code.
+
+	* pmon/P5064/targets.mk: Split sbdflashenv into two separate
+	files: sbdflashenv is board-dependent, flashenv is generic.
+
+	* pmon/target.mk: Added -DIN_PMON so that code can conclusively
+	work out when it is being compiled as part of pmon.
+
+	* pmon/cmdtable.c: Added -w flag to "flash" command to reverse
+	default endianness.
+
+	* pmon/commands.c: Ditto.
+
+	* pmon/load.c: Ditto.  Also use dl_minaddr/maxaddr to determine
+	area of flash to be reprogrammed.
+
+	* pmon/loadfn.h: Added WFLAG.
+
+	* net/cmd/boot.c: Added endianness detect and reverse flag to boot
+	code.  Added MIPS-III ECOFF magic numbers.
+	
+	* net/cmd/ecoff.h: Added support for MIPS-III ECOFF.
+
+Tue Sep  2 18:31:20 1997  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/from.h: Added CMD_OFFS.
+
+	* pmon/p5064/flashdev.h: Added _sbd_flashopen() prototype.  Fixed typo.
+
+	* pmon/p5064/sbdfrom.c: Renamed _sbd_fromcookie to _sbd_flashopen
+
+	* pmon/p5064/flash.c: Changed to use new programbytes() interface.
+
+	* pmon/p5064/sbdflashenv.c: Use _sbd_flashopen.  Don't add in
+	offset twice!
+
+Mon Sep  1 18:00:00 1997  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064/flashdev.h: Convert programbytes() restart parameter
+ 	to flag bits: copy (2) and restart (1).
+
+	* pmon/p5064/sbdfrom.c: Use new flag bits.  Don't free function if
+	not malloced!
+
+Mon Sep  1 14:57:41 1997  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p5064: New P5064 source code.
+	
+	* pmon/P5064: New P5064 binaries.
+	
+	* pmon/pci/pcivar.h: Added pci_map_port() function prototype.
+
+	* pmon/pci/pcireg.h: Fixed missing PCI sub-class types.
+
+	* pmon/pci/pcidevs.c: Changed "serial" sub-class to "serial bus".
+
+	* pmon/pci/pcidevs: Added new entries from latest OpenBSD sources.
+
+	* pmon/pci/pciconf.c: Print PCI function number as "/%d", not
+	"function %d".
+
+	* pmon/gal9/sbdflashenv.c: Check for missing "nvram".
+
+	* pmon/gal9/sbd.c: Fixed sbdcpufreq() to look at correct bits in
+	Config register.
+
+	* pmon/glacier/sbd.c: Ditto.
+
+	* pmon/fnc6/sbd.c: Ditto.
+
+	* pmon/midas/sbd.c: Ditto.
+
+	* pmon/p4032/sbd.c: Ditto, plus make sbdcpufreq() return bus
+	clock, not cpu input clock (different on Vr4100).
+
+	* pmon/p4032/sbdnet.c: Adjust clock tick calculation for Vr4100.
+
+	* pmon/p4032/rtc.c: Timeout the spin on UIP.
+
+	* pmon/set.c: Add default ethernet address for P5064.
+
+	* pmon/regs.c: Changed TLB printing stuff to work out pagesize
+	dynamically, depending on CPU type.
+
+	* pmon/regdefs.c: Fixed some Vr4100 and R5000 Config register bits.
+
+	* pmon/main.c: Changed fraction rounding and printing code to work
+	consistently.
+
+	* pmon/machine.c: Added new R4100 opcodes.
+
+	* pmon/load.c: Made Flash stuff conditional on -DFLASH.
+
+	* net/sys/kern/kern_malloc.c: Minor comment change.
+
+	* net/sys/kern/uipc_mbuf.c: Ditto.
+
+	* net/sys/sys/systm.h: Changed put/get/copy function prototypes to
+	use const.
+
+	* net/sys/kern/kern_glue.c: Ditto for actual definitions.
+
+	* net/sys/drivers/if_de.c: Added P5064 support. In reset code
+	don't wait for initialisation/probe completion, let it happen in
+	course of normal polling. 
+
+	* lib/r4kcflu.S: Minor comment change.
+
+	* include/mips.h: Add $ta0-$ta3 register definitions.  Added
+ 	CFG_ECSHIFT definition for Config register.  Add new Vr4100
+ 	TLB PageMask and EntryHi definitions (1Kb min page size).
+
+Thu Jul 31 00:11:52 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/set.c: Addedd fpfmt==none
+
+	* pmon/regs.c: Fixed a few more formatting errors, added support
+	for fpfmt==none
+
+	* lib/vsprintf.c: Corrected %g format selecter (from SDE-MIPS)
+
+	* lib/modf.c: modf from SDE-MIPS (assembler version was incorrect
+	for fp64)
+
+	* lib/files.mk: Addedd modf.c, removed modf.s
+
+	* include/math.h: Added full prototypes for all functions
+
+Wed Jul 30 14:22:29 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: Initialise _pciverbose in _pci_configure()
+
+	* pmon/gal9/sbdpci.c: Enabled PCI debug if _pciverbose>3
+
+	* pmon/gal9/sbdnet.c: removed initialisation of _pciverbose from
+	eninit()
+
+	* pmon/mips.S: Set SR_FR in emableCU1 if __mipsfp64
+
+	* pmon/main.c: allow SR_FR in initial_sr if it is set by
+	enableCU1, but don't put it in client Status to preserve backwards
+	compatibility.
+
+	* pmon/dis.c: minor formatting adjustments for register contents
+
+Fri Jun 27 16:10:57 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbd.c: Fixed 4100 clock calculations.
+
+	* pmon/gal9/sbdreset.S: Made the memory autoconfiguration code work.
+
+	* pmon/gal9/sbdpci.c: Set the RAS32/RAS10 bank size and enables
+	based on the amount of memory configured.
+
+	* pmon/gal9/sbd.c: Added memory size. General tidy up.
+
+	* pmon/gal9/gt64011.h: Fixed GT_DRAMPAR_BANK3 definition and added
+	yet more registers definitions.
+
+	* pmon/pmon.h: Moved definition of repeating_cmd from R4000
+	specific definitions.
+
+Thu Jun 26 11:00:40 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/gal9/sbdreset.S: Added DRAM configuration code (not
+	completely functional yet...)
+
+	* pmon/gal9/sbdfrom.c: removed initialisation of GT64011 registers
+	for flash bank.  This is now handled in the startup code.
+
+	* pmon/gal9/sbd.c: calculate cpuspeed dynamically instead of
+	assuming that we are running cached.
+
+	* pmon/set.c: Only set default ethernet address for Algorithmics
+	boards. 
+
+	* pmon/regs.c: Adjusted formatting slightly so that register
+	values line up.
+
+	* pmon/main.c: Tidied up clock message, display 2-way cache
+	information. 
+
+Tue Jun 24 21:45:00 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbdreset.S: Explictly clear CFG_AD (for 4100) and set
+	data rate to DDDD (for 4300).  These bits are unwriatable on other
+	processors.
+
+	* pmon/p4032/sbd.c: Add 4100 processor type.  4100 runs the
+	onboard tick counter at pipeline speed.
+
+	* pmon/regdefs.c: Added AD flag to config register for 4100
+
+	* pmon/pmon.h: Added 4100 flag for processor specific registers
+
+	* pmon/mips.S: Check the SR_CU1 gets set when checking for FPU
+
+	* pmon/main.c: Print pipeline & CPU clock
+
+	* lib/r4kcflu.S: 4100 scache sizing
+
+	* include/mips.h: Added 4100 Accelerated Data flag
+
+Tue Jun 24 07:07:50 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/pci_machdep.c: PCI address spaces can now be set from
+	environment variables.  renamed some functions in line with recent
+	pci/* updates.
+
+	* pmon/p4000/sbd.c: Added 4700 processor type
+
+	* pmon/gal9/sbdreset.S: Tidied up debug messages
+
+	* pmon/gal9/sbdpci.c: removed DBGPCI #define
+
+	* pmon/gal9/sbd.c: removed dummy environment routines.
+
+	* pmon/gal9/flash.c: disabled until it works...
+
+	* pmon/GAL9/targets.mk: Added FLASH environment modules
+
+	* net/sys/drivers/if_de.c: Make sure IFF_LINK0 is defined to allow
+	autoselect to work.
+
+	* include/errno.h: Added extra error numbers for SDE
+	compatibility.
+
+	* pmon/pci/pciconf.c: Imported updates from SDE
+
+	* pmon/pci/pcidevs.c: ditto
+
+	* pmon/pci/pcivar.h: ditto
+
+	* pmon/p4032/sbdnet.c: Renamed data structure for SDE
+	compatibility.  
+
+	* pmon/p4032/pci_machdep.c: Enable byte swapper when running
+	bigendian.  Byteswap PCI configuration accesses when running
+	bigendian.
+
+	* pmon/gal9/z8530.h: Added little endian suppport and some
+	additonal control/status bits.
+
+	* pmon/gal9/sbd.h: Changed MHZ to 100 and added additional PCI
+	related constants.
+
+	* pmon/gal9/gt64011.h: Upgraded from SDE.
+
+	* pmon/gal9/sbdreset.S: Use new GT64011 naming conventions
+
+	* pmon/GAL9/targets.mk: Added INET support.
+
+	* pmon/load.c: Added some spl code to avoid overruns when
+	receiving serial & network data simultaneously.
+
+	* pmon/commands.c: Use get_line instead of gets when modifying
+	memory.
+
+	* net/sys/drivers/if_de.c: Work in a bigendian system with
+	byte swapping enabled to preserve data.
+
+	* net/sys/drivers/dc21040reg.h: Removed bitfields which caused
+	incorrect code to be generated for bigendian systems with byte
+	swapping enabled to preserver data.
+
+	* include/varargs.h: Added __VARARGS_H for SDE compatibility
+
+	* Makefile: Change TAGS file generation to use xargs.
+
+Mon Jun 16 12:06:57 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/gal9/z8530.c: Changed initialisation to mimic that used in
+	IDT/sim.  The default initialisation did not work (probably
+	something stupid like default state of handshaking signals).
+
+	* pmon/gal9/gt64011.h: Added more register definitions.
+
+	* pmon/sym.c: Only show symbols if showsym is set.  Don't print
+	symbol value if it is more than 5k away.
+
+	* pmon/set.c: Added -r flag to default breakcmd.  Added defaults
+	for showsym, fpfmt and fpdis variables.
+
+	* pmon/regs.c: added TLB registers to list of registers dump by
+	c0*.  Added autorepeat support.  Print hex value of C0 registers
+	as well as the decoded value.
+
+	* pmon/pmon.h: Added autorepeat flag to command structure.  Added
+	new disassemnbly codes for register dumping.  Added floating point
+	structures.
+
+	* pmon/more.c: set maximum more size to 99
+
+	* pmon/memtst.c: Fixed usage message in option parsing 
+
+	* pmon/main.c: Added autorepeat support
+
+	* pmon/dis.c: Autorepeat support.  Added -r flag to include
+	register contents in disassembly.  Print floating point registers
+	as well if "fpdis" environment variable is set.
+
+	* pmon/machine.c: Added additional flags to support register dump
+
+	* pmon/cmdtable.c: Added autorepeat flag
+	
+	* pmon/commands.c: Autorepeat support for dump
+
+Thu Jun 12 00:46:53 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/commands.c: removed cast warning in reboot
+
+	* pmon/GAL9: Galileo-9 support
+	
+	* pmon/gal9: ditto
+	
+Tue May 13 12:03:36 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/regdefs.c: removed COUNT & COMPARE registers from list
+
+	* pmon/pmon.h: Added F_OTHER flag for register types 
+
+	* pmon/regs.c: Simplified in_machtype
+
+	* pmon/cmdtable.c:  Added reboot command to restart PMON
+	* pmon/commands.c: 
+
+
+Fri May  2 14:56:06 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/regdefs.c: renamed Fcsr status bits in line with
+	documentation. Corrected Wired register decription.
+
+Wed Apr 30 10:46:40 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/w83777f.h: Fixed chipid typos
+
+	* pmon/p4032/sbd.c: Added other processor type clock multipliers
+	(this should probably become generic code)
+
+	* pmon/pmon.h: Removed F_N4650.  Added F_5000.  Made F_ALL or of
+	all F_xxx.
+
+	* pmon/regs.c: 
+	* pmon/regdefs.c: Use new flag definitions.  Added some R5000
+	specific modifications.
+
+Thu Apr 10 20:23:37 1997  Chris Dearman  <chris@algor.co.uk>
+
+
+	* pmon/p4000/sbd.c: removed spurious return in sbd_flash
+
+	* pmon/stty.c: Added support for extended baud rates
+
+	* pmon/loadfn.c:  ditto
+
+	* pmon/load.c:  ditto
+
+	* include/termio.h: ditto
+
+	* lib/termio.c:  ditto	
+
+	* pmon/algcommon/mpsc.c: accept extended baud rates
+
+	* pmon/fnc6/ns16550.c: ditto
+
+	* pmon/p4032/ns16550.c:	 ditto
+	
+Tue Mar 25 11:23:46 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbd.h: fixed CACHECYCLE calculation
+
+	* pmon/p4032/sbd.c: Added 5230 processor type
+
+	* pmon/set.c: added environment building functions envsize & envbuild 
+
+	* pmon/go.c: build environment using environment helper functions
+
+	* pmon/debug.c: call initstack with arg to initialise environment
+
+	* lib/r4kcflu.S: recognise 5230 2way cache from prid
+
+Thu Feb 20 14:53:01 1997  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/mips.S: Add a nop after ctc1.
+
+	* net/sys/drivers/if_de.c: Only include "checkclient" code if
+	compiled for PROM.
+
+	* net/sys/kern/kern_glue.c: Make start() a no-return function
+	(why?) 
+
+	* pmon/fnc6: New board support for Control Techniques P4032
+	derived board.
+
+	* pmon/pablo/sbd.c: Initialise PAGESYNC output to be inactive.
+
+	* pmon/laserfold/ns16550.c: Add OP_FLUSH support.
+	
+	* pmon/laserfold/ns16550.h: Use latest version of this file.
+
+	* pmon/laserfold/sbd.h: Define NS16550_HZ etc.
+
+	* pmon/laserfold/fpanel.c: Tightened up timing to work more
+	reliably on old and new boards.
+
+Mon Feb 10 15:33:32 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/w83777f.h: Added som W83877F definitions
+
+	* pmon/p4032/centronics.c: explicitly enable ECP in
+	WinBond chip to allow access to ECP registers.
+
+	* pmon/load.c: reordered arguments to dl_initialise()
+
+Mon Jan 20 18:10:23 1997  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/midas/sbd.h: added Nigels mods to if_de driver to see if
+	things improve
+
+	* pmon/midas/sbd.c: fixed some fossils
+
+	* pmon/lsipr/sbd.h: 
+	* pmon/lsipr/sbd.c: fixed a few fossils 
+
+	* pmon/lsipr/p2681.h: byte->ubyte
+
+	* pmon/mipsram.S: 
+	* pmon/mips.S: removed TLB functions for LR33000
+
+	* pmon/loadfn.h: made the download variables signed to allow the
+	correct start address to be set 
+
+Tue Dec 10 12:17:14 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/lfold: sadly I'd managed to convolve the lfold and pablo
+	CVS repositories.  To separate them I've deleted lfold and created
+	two new directories "laserfold" and "pablo".
+
+	* pmon/LFOLD/targets.mk: changed to reference new "laserfold"
+	source directory.
+
+Mon Dec  9 19:44:38 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pablo/*.c: first working pablo code.
+
+	* pmon/pmon.h: Fix tlb entry to always be unsigned int, since that
+	is what the assembler code returns.
+
+	* pmon/mips.S: Fix ordering of SR_CU1 tests for R3000.
+
+	* pmon/load.c: Print "downloading from" message before changing
+	baud rate etc, in case we're downloading down from the console.
+
+	* pmon/debug.c: Enable ^C interrupt on debug channel.
+
+	* net/sys/sys/systm.h: Made panic a "noreturn" function.
+
+	* net/sys/machine/stdarg.h: Now uses gcc __builtin_next_arg().
+
+	* net/sys/machine/cpu.h: Split into two separate r3000.h and
+	r4000.h files.
+
+	* net/sys/drivers/if_fe.c: Allow TMASK and RMASK to be specified
+	in sbd.h file; fix definition of OUTSW; switch off IFF_SIMPLEX
+	since we can see our own packets; drop packets more carefully in
+	case of errors; allow B13 register to be specified in sbd.h;
+	optimise send loop to see if there is enough room for each packet,
+	instead of assuming maximum packet size; change some LOG_WARNINGS
+	to LOG_ERRS or LOG_INFO as appropriate; handle pending i/us
+	better. 
+	
+	* net/sys/drivers/mb86960.h: Add some other ident codes.
+
+	* net/libc/netorder.c: Slightly more optimal byteswap code.
+
+	* net/cmd/ping.c: Fixed to clear duplicate bitmap when each packet
+ 	is sent, i.e. inside the flood ping loop.  If -v is given then on
+ 	a dup packet the two ids are printed, also the packets are checked
+ 	for checksum errors, and the packet data is checked even if flood
+	ping is enabled.
+
+Thu Nov  7 14:20:45 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbdreset.S: Cope with nonsquare SIMM types
+
+Wed Oct 30 21:58:56 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbdflash.c: Local define of size_t
+
+Sun Sep 29 00:37:57 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pcidevs_data.h: 
+	* pmon/pci/pcidevs.h: New data files generated from pcidevs
+
+	* pmon/pci/devlist2h.awk: Made PCI device info constant
+
+
+Fri Sep 27 01:44:22 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/flash.c: made it do something useful :-)
+
+	* pmon/xds/sbd.c: 
+	* pmon/p4000/sbd.c: 
+	* pmon/midas/sbd.c: 
+	* pmon/mann/sbd.c: 
+	* pmon/lsipr/sbd.c: 
+	* pmon/libraio/sbd.c: 
+	* pmon/lfold/sbd.c: 
+	* pmon/idt385/sbd.c: 
+	* pmon/cogent/sbd.c: 
+	* pmon/axon2/sbd.c: 
+	* pmon/algvme/sbd.c:  Added stub flash code.
+	
+	* pmon/target.mk: Added -DPMON to options
+
+	* pmon/pmon.h: removed MAXREC definition
+
+	* pmon/loadfn.h: 
+	* pmon/loadfn.c: S3 and LSI support functions
+
+	* pmon/cmdtable.c: Updated boot and load help strings
+
+	* pmon/load.c: Major hackery to allow downloaded files to be blown
+	into flash.
+
+	* net/cmd/boot.c: Major hackery to allow 'boot'ing of s3 and lsi
+	format files and to blow them into flash.
+
+	* lib/strnchr.c: Another obscure and nonstandard function.
+
+	* lib/atob.c: Allowd leading 0x to specify hex input
+
+Thu Sep 19 18:33:03 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/sbdnet.c: Don't overwrite saved spl with getenv
+	result. 
+
+	* pmon/p4032/sbd.c: Identify R4640 Processor ID.
+
+	* pmon/pmon.h: Added "in 4650" and "not in 4650" flags for
+	register tables.  Also added flag word to register field table,
+	to handle field differences between CPUs.
+
+	* pmon/regs.c: Made to understand new register flag bits.  Only
+ 	display floating-point regs in hex on R4640. Note that there is no
+	TLB on R4640.
+
+	* pmon/regdefs.c: Added new R4640/50 registers and differences
+	from standard R4000 set.
+
+	* pmon/main.c: Initialise non-existent m.s. half of R4640/50
+ 	floating-point register set to NaN.
+
+	* lib/r4kcflu.S: Told it the R4640/50 has 2-way set caches.
+
+Tue Sep 10 14:01:20 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pcivar.h: 
+	* pmon/pci/pcireg.h: 
+	* pmon/pci/pcidevs_data.h: 
+	* pmon/pci/pcidevs.h: 
+	* pmon/pci/pciconf.c: 
+	* pmon/pci/devlist2h.awk: 
+	* pmon/p4032/pci_machdep.c: 
+	Modified PCI code to support multifunction cards and rationalised
+	somewhat.
+	
+	* net/sys/drivers/if_de.c: Added some conditional debugging code
+
+	* include/mips.h: Added various TLB registers information
+
+	* pmon/p4032/sbd.h: renamed INTR_DEVX0_PCI to INTR_DEVX0_V96X
+
+	* pmon/regs.c: Added tlbregisters command to dump TLB registers
+
+	* pmon/pmon.h: Added TLB structure
+
+	* pmon/mipsram.S: 
+	* pmon/mips.S: Added tlbread function to read TLB entry
+
+	* pmon/cmdtable.c: Added TLB command to dump TLB registers
+
+Mon Jul 22 14:22:43 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/lfold/sbd.c: Added sbdpipefreq() function.
+
+	* pmon/lfold/fpanel.c: Brought into line with PCL5 version, to
+	  make it work with both old and new pio.
+
+Fri Jun 28 13:07:11 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/v96xpbc.h: Added new LB_CFG register and RD_POST_INH
+	bit.  Fixed name of FIFO_CFG.WR_LB and WR_PCI fields.
+
+	* pmon/p4032/pci_machdep.c: Half added new RD_POST_INH bit and
+	intialisation of new LB_VFG register, but commented out until Rick
+	gets the h/w going!
+
+	* pmon/{libra,LIBRA}: removed and split into separate libraio and
+	lfold directories.
+
+	* pmon/{lfold,LFOLD}: new directories containing support for
+	Europatec/Citadel Laserfold controller.
+
+	* pmon/{libraio,LIBRAIO}: new directories containing support for
+	Libra plus standard IDT Libra i/o card only.
+
+	* pmon/lfold/pio.[ch]: New abstract pio interface.
+
+	* pmon/lfold/npio.h: New "not-pio" pio for low-cost board.
+	
+	* pmon/lfold/i8255.h: Modified to be i8255 specific only.
+
+	* pmon/lfold/fpanel.c: Changed to use new abstract pio.
+
+	* pmon/lfold/eeprom.c: Changed to use new abstract pio.  Added
+	timeout when polling for end of write.
+
+	* pmon/lfold/centronics.c: Changed to use new abstract pio.
+	Added control of centronics status signals.
+
+	* pmon/lfold/sbdreset.S: Don't use alternate cache layout unless
+	ALTCACHE is defined.
+
+	* pmon/lfold/sbd.c: Removed old libra support, and use new
+	abstract pio interface.
+
+	* pmon/LFOLD/targets.mk: removed -DLIBRA and -DNS16550
+
+	* pmon/mips.S: r3000 needs one extra nop after ctc1.
+
+	* pmon/main.c: Moved pmon/run display change so that the display
+	is only rewritten when changing state, not per command.
+
+Fri Jun 28 00:35:14 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbd.c: made include of icujtag.h dependent on REV_A
+	* pmon/p4032/mkjtag.pl: deleted from repository
+	* pmon/P4032/LG/.cvsignore: 
+	* pmon/P4032/BG/.cvsignore: removed icujtag.h and intctrl.bin
+	* pmon/P4032/targets.mk: removed autogeneration of icujtag.h
+
+
+Mon Jun 17 16:24:34 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: print slot number of pciverbose >= 3
+
+	* pmon/p4032/sbdnet.c:  pipe line clock and system clock
+	calculations updated.  added pciverbose environment variable
+
+	* pmon/p4032/sbd.c: 
+	* pmon/algcommon/sbdnet.c: pipe line clock and system clock
+	calculations updated
+
+	* pmon/pmon.h: changed SBD_DISPLAY macro to pass on checkpoint code
+
+	* pmon/mips.S: save errpc (reset address) if a soft reset has occurred
+
+	* pmon/main.c: signon now shows pipeline (internal) frequency
+	removed initialisation of errpc (now done in mips.S)
+
+	* net/sys/drivers/if_de.c: Corrected system error log message
+
+Tue Jun  4 03:07:59 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/p4032/sbd.h: ioaddr{b,h,w} return same value for big/little
+	endian (not strictly correct but all I/O using thses macros is done
+	with words)
+
+	* pmon/p4032/eeprom.c: made endianness independent
+
+	* pmon/P4032/targets.mk: Added BG to build list.  Removed MHZ.
+
+	* pmon/mipsram.S: 
+	* pmon/mips.S: finally reordered code to remove assembler
+	warnings (at the expense of one instruction)
+	
+
+	* net/sys/drivers/if_de.c: fixed bigendian filter setup
+	Hash table generation is probably still incorrect
+
+Wed May 29 23:25:51 1996  Chris Dearman  <chris@waterloo.algor.co.uk>
+
+	* net/sys/drivers/if_fe.c: interface initialisation now done by
+	constants in sbd.h
+
+	* pmon/cogent/sbd.h: added ethernet initialisation constants
+
+Fri May 24 13:26:32 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/v96xpbc.h: Naming of FIFO parameters improved.
+
+	* pmon/p4032/pci_machdep.c: Yet more FIFO tweaking in the light of
+	experiments with the analyser: read fifo fill threshold reduced to
+	refill when any space available.
+
+Thu May 23 15:17:08 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/pci_machdep.c: Read the chip revision even when
+	running in RAM.  Had a go at increasing the local->PCI memory
+	aperture from 128Mb to 256Mb, but it didn't work, of
+	course. Tweaked some of the FIFO parameters to try to improve
+	PCI->local performance for HP, and added some more comments on the
+	setup.  Added omitted readahead fifo parameters for local & pci
+	aperture 0 (would have been refill when not full, rather than when
+	half full).
+
+	* pmon/p4032/v96xpbc.h: Fixed bad bit definition for FIFO_PRIORITY
+	register (we were always giving local->PCI reads priority over
+	writes, which could lead to coherency problems)
+
+Wed May 22 10:50:36 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/pci/pciconf.c: corrected SBD_DISPLAY macro
+
+	* pmon/p4000/sbd.c: corrected SBD_DISPLAY macro
+
+	* pmon/pmon.h: added some missing PCI checkpoint codes
+
+	* GenTarList: explicity set the subdirectories of pmon/pmon to
+	include in a source release
+
+	* pmon/pci/pcireg.h: 
+	* pmon/pci/pciconf.c: Added the PCI 2.1 class types in the vain
+	hope that it might recognise the HP Orca board.
+
+	* pmon/p4032/sbd.h: added default value for MHZ if undefined.
+	Other cosmetic changes.
+
+	* pmon/p4032/pci_machdep.c: don't reset V3 if running from RAM
+	(causes unhandled bus error interrupts).  Only print warning
+	message if it takes more than 1 extra attempt.  Allow access to
+	config registers 0x80-0xff.  Flush write buffer after updating
+	config map (probably unnecessary).  Wait for write FIFO to empty
+	before examining config read status.
+
+	* pmon/p4032/ns16550.c: renamed mpscbrtc -> nsbrtc
+
+	* pmon/p4032/mkjtag.pl: hacked around to prevent it updating the
+	header  file if the binary file hasn't changed
+
+	* pmon/p4032/centronics.c: addedd (untested) host mode
+
+	* pmon/cogent/sbdnet.c: imported ethernet register access functions
+
+	* pmon/cogent/sbd.c: corrected entry for second serial channel
+
+	* pmon/cogent/ns16550.c: renamed mpscbrtc -> nsbrtc
+
+	* pmon/pmon.h: defined new SBD_DISPLAY macro. Added checkpoint
+	codes.
+
+	* pmon/mips.S: deleted SBD_DISPLAY macro (now in pmon.h)
+	Use 64 bit operations to copy data area and handlers if applicable
+	(for the benefit of the broken MIDAS board).
+
+	* pmon/p4032/sbd.c: 
+	* pmon/set.c: 
+	* pmon/main.c: 
+	* pmon/debug.c: Added checkpoint codes for SBD_DISPLAY messages
+
+	* net/sys/drivers/if_fe.c: register access routines moved to sbd code
+
+	* net/sys/drivers/if_de.c: stop polling if controller reprogrammed
+	by client.  Modified handling of system error to prevent death by
+	a thousand log messages. 
+
+	* Makefile: added rule for building TAGS file
+
+Tue Apr 23 10:40:38 1996  Chris Dearman  <chris@algor.co.uk>
+
+	* pmon/P4032/targets.mk: added ITBASE
+	
+	* pmon/debug.c: corrected declaration of readc
+
+	* net/include/errno.h: added in place of soft link
+
+	* pmon/subsys.mk: 
+	* net/sys/subsys.mk: 
+	* net/libc/subsys.mk:
+	* net/cmd/subsys.mk:
+	* lib/subsys.mk: avoid spurious error message when making directories
+	
+	* GenTarList: removed 'private' files from default source tar file
+
+Tue Apr 16 14:22:58 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/sbdreset.S: Chris changed power-on reset code to
+	toggle the V3 reset line.  Nigel changed wbflush() to do an
+	explicit uncached read.
+
+	* pmon/p4032/sbd.h: Add AUTO_BUSY and V96X_ENABLE to BCR register
+	definition.
+
+	* pmon/p4032/sbd.c: Don't enable Ethernet & SCSI here (now done by
+	PCI initialisation).  Implement a timeout when polling RTC for
+	frequency check.
+
+	* pmon/p4032/pci_machdep.c: Chris added code to repeatedly reset
+	V3 chip, until it responds.  Nigel fixed PCI->local aperture base
+	address (one too many zeroes).
+
+	* pmon/p4032/centronics.c: Forcibly enable auto-busy circuit for
+	RevB PCBs.
+
+	* pmon/libra/centronics.c: Fixed references to renamed constants. 
+
+	* pmon/P4032/targets.mk: Bumped -DMHZ to 67 from 50.
+
+	* pmon/P4000/targets.mk: Put -DITBASE back (why did it go?).
+
+	* pmon/regdefs.c: Add ITS bit to status register (should be
+	conditional on R4[123]00.
+
+	* net/sys/drivers/if_sonic.c: Ignore TC interrupt altogether,
+	since it may be used by application.
+
+Mon Mar 18 15:24:33 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/display.c: Change cm1629 to lcd globally.
+	* pmon/p4032/lcd.h: ditto
+
+	* pmon/algcommon/mk48t02.c: Moved shift by 24 into bcd conversion
+	routines.  Fixed tm_mon (0..11) <=> rtc_mon (1..12). Fixed base
+	year (year = tm_year + 1900).  Use gmmktime() not mktime().
+
+	* pmon/cogent/mk48t02.c: Ditto, minus the 24 bit shifts.
+
+	* pmon/p4032/rtc.c: Fixed tm_mon (0..11) <=> rtc_mon (1..12). 
+
+	* pmon/time.c: Fixed off by one error on month when printing date.
+	Made data arrays "const".
+
+Thu Mar 14 13:19:02 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pci/pcivar.h: Added fields for latency calculation per bus.
+
+	* pmon/pci/pciconf.c: Actually try to calculate sensible values
+	for the latency timers on each device (I'm sure it won't work!)
+	Enable parity and SERR handling on each device.
+
+	* pmon/p4032/v96xpbc.h: Added chip revision register.  Fixed name
+	of fields in PCI_BASE0/1 and FIFO_CFG/PRIORITY registers.
+
+	* pmon/p4032/sbdnet.c: Reduce blink frequency to 2Hz.  Disable
+	"interrupts" during PCI configuration.
+
+	* pmon/p4032/sbd.h: Change name INTR_DEV_PCI to INTR_DEV_V96.
+
+	* pmon/p4032/sbd.c: Add cover functions to read/modify/write
+	external interrupt mask, keeping a soft copy in rtc nvram.  Enable
+	SR_IBIT4 to catch PCI read/write errors.  Add long delay after
+	each line of exception error on display.
+
+	* pmon/p4032/rtc.h: Added nvram slot for soft copy of external
+	interrupt mask.
+
+	* pmon/p4032/pci_machdep.c: Fixed initialisation to spot catatonic
+	V962 chip and ask user to press reset!  Set up new PCI->LOCAL
+	aperture with read prefetch enabled.  Change FIFO parameters.
+	Check chip revision when deciding whether to enable various
+	features.  Made device number to idsel mapping more logical.
+
+	* pmon/p4032/display.c: Added 1us delay loops as necessary to make
+	LCD display work.
+
+	* pmon/p4032/cm1629.h: Got register order right!
+
+	* pmon/p4032/centronics.c: Now detects and works around early or
+	late strobe interrupts.  Setting environment variable $cenign=y will
+	quietly junk any input which arrives when device is not open.
+
+	* pmon/main.c: Corrected frequency rounding.
+
+	* pmon/load.c: Added -v flag to print errors as soon as detected,
+	including the faulty line.
+
+	* pmon/commands.c: Added flashprogram() for P4032.
+
+	* pmon/cmdtable.c: Change table entry from sbd_e2program() to
+	e2program().  Added "flash" -> flashprogram().
+
+	* net/sys/machine/param.h: Increased mbuf cluster size to 2K (the
+	DEC ethernet driver expects to get one input packet per cluster).
+
+	* net/sys/drivers/if_de.c: Added P4032 specific media selection
+	(doesn't try to autosense).  Changed some printf() to log(), and
+	added error messages for ethernet errors which were being quietly
+	ignored. Take care when modifying sia registers to write the
+	connectivity register last.  Reset chip on any PCI bus error.
+	Initialise if_type, if_addrlen, etc.  Flush cache before taking
+	uncached pointer to descriptor rings.  Add wakeup if 21041
+	is in snooze/sleep mode, and run initial PLL test.
+
+	* net/sys/drivers/dc21040reg.h: Added definitions to allow access
+	to error type and tx/rx state in status register.
+
+	* lib/termio.c: Don't send initial ^Q when running in ram.
+
+Fri Mar  8 11:37:46 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/p4032/*: Generally made to work!
+
+	* pmon/libra/sbd.c: Fix device table so that tty1 has channel
+	number 0 too, or else it will never get initialised (how did it
+	ever work?)
+
+	* pmon/P4032/targets.mk: Add network libraries and drivers. Add
+	compilation of conversion of ICU JTAG file to C.
+
+	* pmon/time.c: Add gmmktime() function, and try to correct display
+	of week day (its still wrong though!)
+
+	* pmon/pmon.h: Add gmmktime() function prototype.
+
+	* pmon/mipsram.S: Make _pmon_in_ram global.
+
+	* pmon/mips.S: Calculate $s8 relocation factor correctly for the
+	case when we are linked for cache, but running uncached.
+
+	* pmon/meminit.s: Put "j ra" at end of init_tlb()!
+
+	* pmon/main.c: Change prompt etc to PRAM when running in ram.
+	Always reset status register in main, so that we catch further
+	panic interrupts.  Change frequency display to round to one
+	decimal place.
+
+	* pmon/load.c: Define size of error table so that everything keeps
+	in step (we were losing "bad load address" errors).
+
+	* pmon/go.c: Increased max symbol width for stack backtrace.
+
+	* net/sys/drivers/if_de.c: New driver for DEC DC21040 PCI Ethernet
+	Controller.
+
+	* net/sys/drivers/dc21040reg.h: Register defs for DEC DC21040 PCI
+	Ethernet Controller.
+
+	* lib/termio.c: pass valid channel number with OP_INIT
+
+Sun Feb 25 13:59:04 1996  Nigel Stephens  <nigel@algor.co.uk>
+
+	* pmon/pmon.h: Added common definition of struct tm and time
+	conversion functions.
+
+	* pmon/mips.S: Set $s8 to zero for SDE compatiblity.
+
+	* pmon/meminit.s: Reusable memory sizing and clearing code.
+
+	* pmon/files.mk: Added time.c to file list.
+
+	* pmon/algcommon/mk48t02.c: Removed private time conversion
+	functions and dat command.
+
+	* pmon/cogent/mk48t02.c: Ditto.
+
+	* pmon/time.c: New file containing common time conversion
+	functions and "date" command.
+
+	* pmon/P4032: new build directory for P4032.
+
+	* pmon/p4032: new source directory for P4032.
+
+	* include/mips.h: Added SDE-MIPS style macros and definitions to
+	aid portability of code between PMON and SDE kit.
+

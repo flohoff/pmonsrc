@@ -1,0 +1,15 @@
+/*
+ * TEMIC/sbdser.S: low level serial i/o for Algor/TEMIC module
+ * Copyright (c) 1999 Algorithmics Ltd.
+ */
+
+#include "sbd.h"
+#include "vrc5074.h"
+	
+/* always read scratch register before others to work around chip bug */
+#define NS16550_INB(dst,offs,base) \
+	lbu	zero,SCR(base); \
+	lbu	dst,offs(base)
+
+/* Generic NS16550 UART driver */
+#include "../share/ns16550.s"

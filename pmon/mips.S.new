@@ -1,0 +1,1435 @@
+/* $Id: mips.S.new,v 1.2 1996/01/16 14:23:11 chris Exp $ */
+
+/* mips.s - startup code for PMON
+ *	The contents of this file are not copyrighted in any
+ *	way, and may therefore be used without restiction.
+ */
+
+#include "mips.h"
+#include "pmon.h"
+#ifdef R3081
+#include "r3081.h"
+#endif
+#ifdef R3041
+#include "r3041.h"
+#endif
+
+#ifdef R4000
+#define MFC_NOP	nop; nop
+#else
+#define MFC_NOP	nop
+#endif
+
+#if __mips >= 3
+#define SREG(reg,rno,base)	sd	reg,+((rno)*8)(base)
+#define LREG(reg,rno,base)	ld	reg,+((rno)*8)(base)
+#define MTC0			dmtc0
+#define MFC0			dmfc0
+#else
+#define SREG(reg,rno,base)	sw	reg,+((rno)*4)(base)
+#define LREG(reg,rno,base)	lw	reg,+((rno)*4)(base)
+#define MTC0			mtc0
+#define MFC0			mfc0
+#endif
+
+#define SBD_DISPLAY(c0,c1,c2,c3, n) \
+	li	a0,+((c0)<<24) | ((c1)<<16) | ((c2)<<8) | (c3); \
+	li	a1,+(n); \
+	jal sbddisplay; \
+	sll zero,zero,zero
+
+
+	.text
+
+#ifdef ITBASE
+
+#ifdef MIPSEB
+#define BTMAGIC	((0xcafe << 16)|4321)
+#else
+#define BTMAGIC	((0xcafe << 16)|1234)
+#endif
+#define IT_BOOTPKG	(0*8)
+#define IT_BEVTLB	(1*8)
+#define IT_BEVGEN	(2*8)
+#define IT_BEVXTLB	(3*8)
+#define IT_BEVCACHE	(4*8)
+#define IT_BEVDBG	(5*8)
+#define IT_BEVBAD	(6*8)
+#define IT_MAIN		(7*8)
+
+#ifdef R4000
+#define r3k_utlb_bev	li k1,ITBASE+IT_BEVBAD; j k1
+#define lr33k_dbg_bev	li k1,ITBASE+IT_BEVBAD; j k1
+#define r3k_gen_bev	li k1,ITBASE+IT_BEVBAD; j k1
+#define r4k_tlb_bev	li k1,ITBASE+IT_BEVTLB; j k1
+#define r4k_xtlb_bev	li k1,ITBASE+IT_BEVXTLB; j k1
+#define r4k_cache_bev	li k1,ITBASE+IT_BEVCACHE; j k1
+#define r4k_gen_bev	li k1,ITBASE+IT_BEVGEN; j k1
+#else /* !R4000 */
+#define r3k_utlb_bev	li k1,ITBASE+IT_BEVUTLB; j k1
+#define lr33k_dbg_bev	li k1,ITBASE+IT_BEVDBG; j k1
+#define r3k_gen_bev	li k1,ITBASE+IT_BEVGEN; j k1
+#define r4k_tlb_bev	li k1,ITBASE+IT_BEVBAD; j k1
+#define r4k_xtlb_bev	li k1,ITBASE+IT_BEVBAD; j k1
+#define r4k_cache_bev	li k1,ITBASE+IT_BEVBAD; j k1
+#define r4k_gen_bev	li k1,ITBASE+IT_BEVBAD; j k1
+#endif /* R4000 */
+#else /* !ITBASE */
+#define r3k_utlb_bev	j __bev
+#define lr33k_dbg_bev	j __bev
+#define r3k_gen_bev	j __bev
+#define r4k_tlb_bev	j __bev
+#define r4k_xtlb_bev	j __bev
+#ifdef R4000
+#define r4k_cache_bev	j cerrhandler
+#else
+#define r4k_cache_bev	j __bev
+#endif
+#define r4k_gen_bev	j __bev
+#endif
+
+reset_exception:
+	.set noreorder
+	.set noat
+
+#ifdef ITBASE
+	.set nomacro
+	li	k1,ITBASE+IT_BOOTPKG	# RESET entrypoint
+	j	k1
+	li	a0,7			# BDSLOT & VxWorks Reboot entrypoint
+	li	k1,ITBASE+IT_BOOTPKG
+	j	k1
+	nop
+	.set macro
+#else
+	j	start			# RESET entrypoint
+	move	k0,zero
+	j	start			# VxWorks Reboot entrypoint
+	move	k0,zero
+#endif
+	.set reorder
+
+
+/*
+ * Boot Exception Vectors
+ */
+	.align  8	/* bfc00100: r3000 utlb miss */
+	r3k_utlb_bev
+
+	.align  6	/* bfc00140: lr33000 debug  */
+	lr33k_dbg_bev
+
+	.align 7	/* bfc00180: r3000 general */
+	r3k_gen_bev
+
+	.align  9	/* bfc00200: r4000 tlbmiss */
+	r4k_tlb_bev
+
+	.align	7	/* bfc00280: r4000 xtlbmiss */
+	r4k_xtlb_bev
+
+	.align	7	/* bfc00300: r4000 cache error */
+	r4k_cache_bev
+
+	.align	7	/* bfc00380: r4000 general */
+	r4k_gen_bev
+
+	.set	at
+
+	.align  10	/* bfc00400: ITPROM boot package table */
+
+#ifdef ITBASE
+	.word	-1,-1,-1,-1,-1,-1,-1,-1		# pkg 0
+	.word	-1,-1,-1,-1,-1,-1,-1,-1		# pkg 1
+	.word	-1,-1,-1,-1,-1,-1,-1,-1		# pkg 2
+	.word	-1,-1,-1,-1,-1,-1,-1,-1		# pkg 3
+	.word	-1,-1,-1,-1,-1,-1,-1,-1		# pkg 4
+	.word	-1,-1,-1,-1,-1,-1,-1,-1		# pkg 5
+
+	/* PMON package */
+	.word	BTMAGIC
+	.word	start	
+	.word	etext
+	.word	-1		# checksum
+	.word	start
+	.word	-1,-1,-1		
+
+	/* ITROM package */
+	.word	BTMAGIC
+	.word	ITBASE
+	.word	ITBASE+0x10000
+	.word	-1		# checksum
+	.word	ITBASE+IT_MAIN
+	.word	-1,-1,-1		
+#else
+	.space	256
+#endif /* ITBASE */
+
+/* bfc00500: entrypoint table */
+	.globl util_routines
+util_routines:
+	.word	read		# 0
+	.word	write		# 1
+	.word	open		# 2
+	.word	close		# 3
+	.word	ioctl		# 4
+	.word	printf		# 5
+	.word	vsprintf	# 6
+	.word	ttctl		# 7
+
+	.word	cliexit		# 8
+	.word	getenv		# 9
+	.word	onintr		# 10
+	.word	flush_cache	# 11
+	.word	_exception	# 12
+#if defined(FLOATINGPT)
+	.word	_fpstatesz	# 13
+#ifdef NEWFP
+	.word	0		# 14
+#else
+	.word	_fpinit		# 14
+#endif
+	.word	_fpstate	# 15
+	.word	cop1		# 16
+#else
+	.word	0
+	.word	0
+	.word	0
+	.word	0
+#endif
+	.word	adr2symoff	# 17
+	.word	sym2adr		# 18
+	.word	sbdcpufreq	# 19
+#ifdef INET
+	.word	_getperrno	# 20
+	.word	strerror	# 21
+	.word	soc_syscall	# 22
+	.word	soc_exit	# 23
+#else
+	.word	0		# 20
+	.word	0		# 21
+	.word	0		# 22
+	.word	0		# 23
+#endif
+
+#ifdef INET
+#define STKSIZE 0x3000
+#else
+#define STKSIZE 8192
+#endif
+
+	.comm	stack,STKSIZE
+	.comm	hndlrtbl,32*4
+	.comm	_filebase,4
+
+/*
+ * This is the entry point of the entire PROM Monitor
+ */
+	.globl start
+	.ent start
+start:
+	.globl __start
+	.aent __start
+__start:
+	move	k0,zero
+	# force kSeg1 in case control is passed here from Kseg0
+	la	t0,1f
+	or	t0,K1BASE
+	j	t0
+1:
+
+	# set s7 if not running in rom
+	li	t1,0x1fc00000
+	and	t0,t1
+	sne	s7,t0,t1
+
+	# skip board initialisation if not running in rom
+	bnez	s7,zbss
+
+	# set SR and CAUSE to something sensible
+#ifdef R4000
+	.set noreorder
+	mfc0	t0,C0_PRID
+	mfc0	v0,C0_SR
+	mtc0	zero,C0_WATCHLO
+	mtc0	zero,C0_WATCHHI
+	.set reorder
+	and	v0,SR_SR		# preserve Soft Reset
+	bne	t0,0x0a11,1f
+	or	v0,SR_BEV		# set Boot Exceptions (BDSLOT)
+	or	v0,SR_DE		# R4200 rev 1.1: disable cache errors
+1:
+#elif defined (LR33000)
+	li	v0,SR_BEV
+#else
+	li	v0,SR_BEV|SR_PE		# Set Boot Exceptions; clear Parity Error
+#endif /* R4000 */
+	.set noreorder
+	mtc0	v0,C0_SR
+	mtc0	zero,C0_CAUSE
+	.set reorder
+
+        # set up a K1seg stack
+1:	la      sp,stack+STKSIZE-24
+	or      sp,K1BASE
+
+	# board-dependent low-level initialisation
+	jal	sbdreset
+
+	SBD_DISPLAY('D','A','T','A', 0x8)
+#ifdef BSOTSUN
+	la	t0,__lc_cp
+	lw	t7,(t0)		# number of entries
+	addu	t4,t0,4		# address of first entry
+2:	beq	t7,zero,3f
+
+	lw	t1,0(t4)	# dest
+	lw	t2,4(t4)	# src
+	lw	t3,8(t4)	# len
+
+	# inner loop
+1:	beq	t3,zero,1f
+	lw	t0,(t2)
+	sw	t0,(t1)
+	addu	t1,4
+	addu	t2,4
+	subu	t3,4
+	b	1b
+
+1:	# next section
+	addu	t4,12		# size of entry
+	subu	t7,1
+	b	2b
+3:
+#else
+	# copy .data to RAM
+	# src=etext dst=_fdata stop=edata
+	la	t0,etext
+
+#if 1
+	/* SDE convert program puts data on next 16-byte boundary */
+	addu	t0,15
+	and	t0,~15
+ 	la	t1,_fdata
+#else
+ 	la	t1,FDATA	# work around for linker bug
+#endif
+	or	t1,K1BASE
+	la	t2,edata
+	or	t2,K1BASE
+
+1:	lw	t3,(t0)
+	sw	t3,(t1)
+	addu	t0,4
+	addu	t1,4
+	bltu	t1,t2,1b
+
+zbss:	SBD_DISPLAY('Z','B','S','S', 0x9)
+	# clear bss
+	la	v0,_fbss
+	la	v1,end
+	or	v0,K1BASE
+	or	v1,K1BASE
+1:
+	sw	$0,0x0(v0)
+	sw	$0,0x4(v0)
+	sw	$0,0x8(v0)
+	sw	$0,0xc(v0)
+	addu	v0,16
+	bltu	v0,v1,1b
+#endif
+
+	# skip handler installation if not in rom
+	bnez	s7,2f
+
+	# boot exceptions can now vector to normal exception handler
+	la	k0,_exception
+
+	SBD_DISPLAY('H','A','N','D', 0xa)
+	# copy handler
+	la      a0,handler
+	la      a1,ehandler
+	li      a2,0x0000000           # utlb miss
+	jal     copyHandler
+#ifdef LR33000
+	li      a2,0x0000040           # debug 
+	jal     copyHandler
+#endif
+	li      a2,0x0000080           # general/r4000 xtlb
+	jal     copyHandler
+#ifdef R4000
+	li	a2,0x0000180		# r4000 general
+	jal     copyHandler
+
+	la      a0,cerrhandler
+	la      a1,ecerrhandler
+	li	a2,0x0000100		# r4000 cache error
+	jal     copyHandler
+#endif
+2:
+
+#ifdef R4000
+	jal	size_cache
+#endif
+	# flush the caches
+	li	a0,DCACHE
+	jal	flush_cache
+	li	a0,ICACHE
+	jal	flush_cache
+
+	# ok to use k0seg stack and pc now
+	la	sp,stack+STKSIZE-24
+	la	t0,1f
+	j	t0
+1:
+
+	# initialise C level board-dependent devices
+	SBD_DISPLAY('S','B','D','M', 0xb)
+	jal	sbdmachinit
+
+
+	SBD_DISPLAY('C','R','E','G', 0xd)
+
+	#########################################################
+	#	Set initial client conditions			#
+	#
+	la	t0,DBGREG
+
+	.set noreorder
+	mfc0	t1,C0_CAUSE
+	mfc0	t2,C0_PRID
+ 	mfc0	t3,C0_SR
+#if defined(R4000)
+	mfc0	t4,C0_CONFIG
+#endif
+	SREG(t1,R_CAUSE,t0)
+	SREG(t2,R_PRID,t0)
+  	and	t3,~SR_BEV		# switch off Boot Exceptions
+ 	mtc0	t3,C0_SR
+  	SREG(t3,R_STATUS,t0)
+#if defined(R4000)
+	SREG(t4,R_CONFIG,t0)
+#endif
+
+	.set reorder
+
+	SBD_DISPLAY('D','B','G','I', 0xc)
+#ifdef ENB_SHRC
+	# provide address for use by shrc function. This feature 
+	# is normally disabled because it can cause 
+	# problems if the PROM has junk in the end.
+#ifdef SABLE
+	li	a0,0xa0070000
+#else
+	la	a0,edata
+	la	t1,_fdata
+	subu	a0,t1
+	la	t1,etext
+	addu	a0,t1
+#endif
+#endif
+	jal	dbginit		# initialize PMON
+	# ints might be enabled from here on
+
+	#							#
+	#########################################################
+
+	SBD_DISPLAY('M','A','I','N', 0xe)
+	jal	main		# transfer to main part of PMON
+
+	j	start
+	.end start
+
+	.globl handler
+	.ent handler
+/*
+ * This is the handler that gets copied to the exception vector addresses.
+ */
+handler:
+	.set noat
+	la	k0,_exception
+	j	k0
+ehandler:
+	.set at
+	.end handler
+
+
+
+	.globl _exit
+	.ent _exit
+/*
+ * This is an exit routine, it should never be called except when PMON
+ * is aborted while running under SABLE.
+ */
+_exit:	
+#ifndef SABLE 
+	break 0
+#endif
+	j	ra
+	.end _exit
+
+
+	.globl cliexit
+	.ent cliexit
+/*
+ * This is called when a client terminates normally.
+ */
+cliexit:
+	la	sp,stack+STKSIZE-24
+	SBD_DISPLAY('E','X','I','T', 0xe)
+	j	main
+	.end cliexit
+
+	.globl	_go
+	.ent _go
+/*
+ * This routine is used to transfer control to a client program.
+ */
+_go:
+	li	a0,2
+	jal	swlst
+
+	la	gp,DBGREG
+
+	# at restored later		/* $1  (at) */
+	LREG(v0,R_V0,gp)		/* $2  (v0) */
+	LREG(v1,R_V1,gp)		/* $3  (v1) */
+	LREG(a0,R_A0,gp)		/* $4  (a0) */
+	LREG(a1,R_A1,gp)		/* $5  (a1) */
+	LREG(a2,R_A2,gp)		/* $6  (a2) */
+	LREG(a3,R_A3,gp)		/* $7  (a3) */
+	# t0 restored later		/* $8  (t0) */
+	# t1 restored later		/* $9  (t1) */
+	LREG(t2,R_T2,gp)		/* $10 (t2) */
+	LREG(t3,R_T3,gp)		/* $11 (t3) */
+	LREG(t4,R_T4,gp)		/* $12 (t4) */
+	LREG(t5,R_T5,gp)		/* $13 (t5) */
+	LREG(t6,R_T6,gp)		/* $14 (t6) */
+	LREG(t7,R_T7,gp)		/* $15 (t7) */
+	LREG(s0,R_S0,gp)		/* $16 (s0) */
+	LREG(s1,R_S1,gp)		/* $17 (s1) */
+	LREG(s2,R_S2,gp)		/* $18 (s2) */
+	LREG(s3,R_S3,gp)		/* $19 (s3) */
+	LREG(s4,R_S4,gp)		/* $20 (s4) */
+	LREG(s5,R_S5,gp)		/* $21 (s5) */
+	LREG(s6,R_S6,gp)		/* $22 (s6) */
+	LREG(s7,R_S7,gp)		/* $23 (s7) */
+	LREG(t8,R_T8,gp)		/* $24 (t8) */
+	LREG(t9,R_T9,gp)		/* $25 (t9) */
+	# k0 not restored		/* $26 (k0) */
+	# k1 restored later		/* $27 (k1) */
+	# gp restored later		/* $28 (gp) */
+	LREG(sp,R_SP,gp)		/* $29 (sp) */
+	LREG(s8,R_FP,gp)		/* $30 (s8) */
+	LREG(ra,R_RA,gp)		/* $31 (ra) */
+
+	LREG(t0,R_HI,gp)		/* Hi */
+	LREG(t1,R_LO,gp)		/* Lo */
+	mthi	t0
+	mtlo	t1
+
+	.set	noat
+	.set noreorder
+
+	# restore SR from Status but fixup the KU&IE field
+	# to make sure that correct value is restored after the rfe
+#ifdef R4000
+	mtc0	zero,C0_SR		# set IMASK & IE = 0 before setting EXL
+	LREG(t0,R_STATUS,gp)		# get Status
+	or	t0,SR_EXL		# set EXL
+	nop
+#else
+	mtc0	zero,C0_SR		# clear IEC (and everything else)
+	# interrupts now off (k0 & k1 safe)
+	LREG(t1,R_STATUS,gp)		# get Status
+	li	AT,0x3f			# KU&IE mask
+	and	t0,t1,AT		# get KU&IE field
+	not	AT			# invert mask
+	and	t1,AT			# clear KU&IE field
+	sll	t0,2			# fixup KU&IE field
+	or	t0,t1			# insert KU&IE field
+#endif
+	mtc0	t0,C0_SR
+
+#ifdef FLOATINGPT
+	and	t1,t0,SR_CU1
+	beqz	t1,1f
+	nop
+	LREG(t3,R_FCR,gp)
+#if __mips >= 3
+	ldc1	$f0,R_F0*8(gp)
+	ldc1	$f2,R_F2*8(gp)
+	ldc1	$f4,R_F4*8(gp)
+	ldc1	$f6,R_F6*8(gp)
+	ldc1	$f8,R_F8*8(gp)
+	ldc1	$f10,R_F10*8(gp)
+	ldc1	$f12,R_F12*8(gp)
+	ldc1	$f14,R_F14*8(gp)
+	ldc1	$f16,R_F16*8(gp)
+	ldc1	$f18,R_F18*8(gp)
+	ldc1	$f20,R_F20*8(gp)
+	ldc1	$f22,R_F22*8(gp)
+	ldc1	$f24,R_F24*8(gp)
+	ldc1	$f26,R_F26*8(gp)
+	ldc1	$f28,R_F28*8(gp)
+	ldc1	$f30,R_F30*8(gp)
+
+	and	t1,t0,SR_FR
+	beqz	t1,1f
+	ctc1	t3,C1_CSR		# BDSLOT
+
+	/* SR.FR is set: restore the other 16 registers too */
+	ldc1	$f1,R_F1*8(gp)
+	ldc1	$f3,R_F3*8(gp)
+	ldc1	$f5,R_F5*8(gp)
+	ldc1	$f7,R_F7*8(gp)
+	ldc1	$f9,R_F9*8(gp)
+	ldc1	$f11,R_F11*8(gp)
+	ldc1	$f13,R_F13*8(gp)
+	ldc1	$f15,R_F15*8(gp)
+	ldc1	$f17,R_F17*8(gp)
+	ldc1	$f19,R_F19*8(gp)
+	ldc1	$f21,R_F21*8(gp)
+	ldc1	$f23,R_F23*8(gp)
+	ldc1	$f25,R_F25*8(gp)
+	ldc1	$f27,R_F27*8(gp)
+	ldc1	$f29,R_F29*8(gp)
+	ldc1	$f31,R_F31*8(gp)
+#else
+	lwc1	$f0,R_F0*4(gp)
+	lwc1	$f1,R_F1*4(gp)
+	lwc1	$f2,R_F2*4(gp)
+	lwc1	$f3,R_F3*4(gp)
+	lwc1	$f4,R_F4*4(gp)
+	lwc1	$f5,R_F5*4(gp)
+	lwc1	$f6,R_F6*4(gp)
+	lwc1	$f7,R_F7*4(gp)
+	lwc1	$f8,R_F8*4(gp)
+	lwc1	$f9,R_F9*4(gp)
+	lwc1	$f10,R_F10*4(gp)
+	lwc1	$f11,R_F11*4(gp)
+	lwc1	$f12,R_F12*4(gp)
+	lwc1	$f13,R_F13*4(gp)
+	lwc1	$f14,R_F14*4(gp)
+	lwc1	$f15,R_F15*4(gp)
+	lwc1	$f16,R_F16*4(gp)
+	lwc1	$f17,R_F17*4(gp)
+	lwc1	$f18,R_F18*4(gp)
+	lwc1	$f19,R_F19*4(gp)
+	lwc1	$f20,R_F20*4(gp)
+	lwc1	$f21,R_F21*4(gp)
+	lwc1	$f22,R_F22*4(gp)
+	lwc1	$f23,R_F23*4(gp)
+	lwc1	$f24,R_F24*4(gp)
+	lwc1	$f25,R_F25*4(gp)
+	lwc1	$f26,R_F26*4(gp)
+	lwc1	$f27,R_F27*4(gp)
+	lwc1	$f28,R_F28*4(gp)
+	lwc1	$f29,R_F29*4(gp)
+	lwc1	$f30,R_F30*4(gp)
+	ctc1	t3,C1_CSR
+	lwc1	$f31,R_F31*4(gp)
+	nop
+#endif
+1:	
+#endif /* FLOATINGPT */
+
+
+#ifdef LR33000
+	LREG(t0,R_DCIC,gp)		/* DCIC */
+	LREG(t1,R_BPC,gp)		/* BPC */
+	LREG(AT,R_BDA,gp)		/* BDA */
+	mtc0	t0,C0_DCIC
+	mtc0	t1,C0_BPC
+	mtc0	AT,C0_BDA
+#else
+	LREG(t0,R_ENTRYHI,gp)		/* EntryHi */
+	LREG(t1,R_CONTEXT,gp)		/* Context */
+	LREG(AT,R_INDEX,gp)		/* Index */
+	mtc0	t0,C0_TLBHI
+	MTC0	t1,C0_CTEXT
+	mtc0	AT,C0_INX
+	LREG(t0,R_ENTRYLO,gp)		/* EntryLo */
+#if __mips >= 3
+	LREG(t1,R_XCONTEXT,gp)		/* XContext */
+#else
+	nop
+#endif
+	mtc0	t0,C0_TLBLO
+#if __mips >= 3
+	MTC0	t1,C0_XCTEXT
+#endif
+
+#ifdef R4000
+	LREG(t0,R_ENTRYLO1,gp)		/* TLB EntryLo1 */
+	LREG(t1,R_PGMASK,gp)		/* TLB PageMask */
+	LREG(AT,R_WIRED,gp)		/* TLB Wired */
+	mtc0	t0,C0_TLBLO1
+	mtc0	t1,C0_PGMASK
+	mtc0	AT,C0_WIRED
+	LREG(t0,R_WATCHLO,gp)		/* WatchpointLo */
+	LREG(t1,R_WATCHHI,gp)		/* WatchpointHi */
+	LREG(AT,R_LLADDR,gp)		/* LLAddr */
+	mtc0	t0,C0_WATCHLO
+	mtc0	t1,C0_WATCHHI
+	mtc0	t1,C0_LLADDR
+	LREG(t0,R_ECC,gp)		/* ECC */
+	LREG(t1,R_TAGLO,gp)		/* TagLo */
+	LREG(AT,R_TAGHI,gp)		/* TagHi */
+	mtc0	t0,C0_ECC
+	mtc0	t1,C0_TAGLO
+	mtc0	t1,C0_TAGHI
+#endif
+#endif
+
+#ifdef R4000
+	LREG(AT,R_EPC,gp)		/* EPC */
+	LREG(t1,R_CAUSE,gp)		/* Cause - For Sw field only */
+	LREG(t0,R_T0,gp)		/* $8  (t0) */
+	MTC0	AT,C0_EPC
+	mtc0	t1,C0_CAUSE
+	LREG(AT,R_AT,gp)		/* $1  (AT) */
+	LREG(t1,R_T1,gp)		/* $8  (t0) */
+	LREG(k1,R_K1,gp)		/* $27 (k1) */
+	LREG(gp,R_GP,gp)		/* $28 (gp) */
+	eret
+	nop
+#else
+	LREG(t1,R_CAUSE,gp)		/* Cause - For Sw field only */
+	LREG(t0,R_T0,gp)		/* $8  (t0) */
+	mtc0	t1,C0_CAUSE
+	LREG(AT,R_AT,gp)		/* $1  (AT) */
+	LREG(t1,R_T1,gp)		/* $8  (t0) */
+	LREG(k0,R_EPC,gp)		/* EPC */
+	LREG(k1,R_K1,gp)		/* $27 (k1) */
+	LREG(gp,R_GP,gp)		/* $28 (gp) */
+	j	k0			# transfer control to client
+	rfe
+#endif
+	.set at
+	.set reorder
+	.end _go
+
+
+	.set noat
+	.set noreorder
+	.ent __bev
+__bev:
+	# k0 can be used to point to an exception handler
+	beqz	k0,1f
+	nop
+	j	k0
+	move	k0,zero
+	.set reorder
+	.set at
+
+	MFC0	a0,C0_EPC
+	MFC0	a1,C0_CAUSE
+	MFC0	a3,C0_BADVADDR
+#if __mips >= 3
+	dmove	a2,ra
+#else
+	move	a2,ra
+#endif
+	
+__bev_fail:
+	la      sp,stack+STKSIZE-24
+	or      sp,K1BASE
+	move s0,a0; move s1,a1; move s2,a2; move s3,a3
+	move	v0,zero
+
+1:	move a0,s0; move a1,s1; move a2,s2; move a3,s3
+	sw	v0,16(sp)
+	jal	sbdexception
+	b	1b
+	.end __bev
+
+
+	.globl	_exception
+	.ent _exception
+/*
+ * This routine is used to save the state of a client program after
+ * an exception is encountered. But it first checks to see if there
+ * is a user defined exception handler (via onintr), and then checks
+ * to see if it's a floating-point instruction (if PMON has fp emulation
+ * enabled.)
+ */
+_exception:
+	.set noat
+	la	k0,DBGREG
+	SREG(k1,R_K1TMP,k0)
+
+	/* if (curlst == &pmlst) branch to exc2 */
+	la	k0,curlst
+	lw	k0,(k0)
+	la	k1,pmlst
+	beq	k0,k1,exc2	# skip if in PMON
+
+	# see if we have a user defined handler
+	.set noreorder
+	mfc0	k0,C0_CAUSE
+	.set reorder
+	la	k1,hndlrtbl
+	and	k0,CAUSE_EXCMASK
+	addu	k1,k0		# calc table entry addr
+	move	k0,zero
+	lw	k1,(k1)		# get contents of table entry
+	beq	k1,zero,exc2
+	lw	k0,4(k1)	# user routine addr
+	la	k1,DBGREG
+	LREG(k1,R_K1TMP,k1)	# restore k1
+	.set noreorder
+	j	k0		# jump to user handler
+	move	k0,zero
+	.set reorder
+
+exc2:
+#if defined(FLOATINGPT) && !defined(R4000)
+	/* see if it's a cp1 unusable */
+	.set noreorder
+	mfc0	k0,C0_CAUSE
+
+	.set reorder
+	li	k1,(CAUSE_CEMASK|CAUSE_EXCMASK)
+	and	k0,k1
+	li	k1,(1<<CAUSE_CESHIFT)|EXC_CPU;
+	bne	k0,k1,1f
+
+	la	k0,cop1		# jump to emulation package
+	la	k1,DBGREG
+	LREG(k1,R_K1TMP,k1)	# restore k1
+	.set noreorder
+	j	k0
+	move	k0,zero
+	.set reorder
+#endif
+
+1:	# if (curlst == &clilst) branch to 1f
+	la	k0,curlst
+	lw	k0,(k0)
+	la	k1,clilst
+	.set noreorder
+	beq	k0,k1,1f
+	move	k0,zero			# BDSLOT
+
+	MFC0	a0,C0_EPC
+	MFC0	a1,C0_CAUSE
+#ifndef LR33000
+	MFC0	a3,C0_BADVADDR
+#endif
+
+	lw	t1,initial_sr
+        li      a2, ~SR_IMASK
+	and	t1,a2
+	mtc0	t1,C0_SR
+	la	sp,stack+STKSIZE-24
+	j	pmexception
+	move	a2,ra
+	.set reorder
+
+1:	la	k1,DBGREG
+	SREG(t0,R_T0,k1)		/* $8  (t0) */
+	move	t0,k1			# now use t0 as pointer
+	LREG(k1,R_K1TMP,t0)
+	SREG(AT,R_AT,t0)		/* $1  (AT) */
+	.set at
+	SREG(v0,R_V0,t0)		/* $2  (v0) */
+	SREG(v1,R_V1,t0)		/* $3  (v1) */
+	SREG(a0,R_A0,t0)		/* $4  (a0) */
+	SREG(a1,R_A1,t0)		/* $5  (a1) */
+	SREG(a2,R_A2,t0)		/* $6  (a2) */
+	SREG(a3,R_A3,t0)		/* $7  (a3) */
+	SREG(t1,R_T1,t0)		/* $9  (t1) */
+	SREG(t2,R_T2,t0)		/* $10 (t2) */
+	SREG(t3,R_T3,t0)		/* $11 (t3) */
+	SREG(t4,R_T4,t0)		/* $12 (t4) */
+	SREG(t5,R_T5,t0)		/* $13 (t5) */
+	SREG(t6,R_T6,t0)		/* $14 (t6) */
+	SREG(t7,R_T7,t0)		/* $15 (t7) */
+	SREG(s0,R_S0,t0)		/* $16 (s0) */
+	SREG(s1,R_S1,t0)		/* $17 (s1) */
+	SREG(s2,R_S2,t0)		/* $18 (s2) */
+	SREG(s3,R_S3,t0)		/* $19 (s3) */
+	SREG(s4,R_S4,t0)		/* $20 (s4) */
+	SREG(s5,R_S5,t0)		/* $21 (s5) */
+	SREG(s6,R_S6,t0)		/* $22 (s6) */
+	SREG(s7,R_S7,t0)		/* $23 (s7) */
+	SREG(t8,R_T8,t0)		/* $24 (t8) */
+	SREG(t9,R_T9,t0)		/* $25 (t9) */
+					/* $26 (k0) */
+	SREG(k1,R_K1,t0)		/* $27 (k1) */
+	SREG(gp,R_GP,t0)		/* $28 (gp) */
+	SREG(sp,R_SP,t0)		/* $29 (sp) */
+	SREG(s8,R_FP,t0)		/* $30 (s8) */
+	SREG(ra,R_RA,t0)		/* $31 (ra) */
+
+	mfhi	t1
+	mflo	t2
+	SREG(t1,R_HI,t0)		/* Hi */
+	SREG(t2,R_LO,t0)		/* Lo */
+
+	.set noreorder
+#ifdef LR33000
+	mfc0	t1,C0_DCIC
+	mfc0	t2,C0_BPC
+	mfc0	t3,C0_BDA
+	SREG(t1,R_DCIC,t0)		/* DCIC */
+	SREG(t2,R_BPC,t0)		/* BPC */
+	SREG(t3,R_BDA,t0)		/* BDA */
+	and	t1,~DCIC_DE		# make sure the DE bit is cleared
+	mtc0	t1,C0_DCIC
+#else
+	mfc0	t1,C0_TLBHI
+	MFC0	t2,C0_CTEXT
+	mfc0	t3,C0_INX
+	SREG(t1,R_ENTRYHI,t0)		/* EntryHi */
+	SREG(t2,R_CONTEXT,t0)		/* Context */
+	SREG(t3,R_INDEX,t0)		/* Index */
+	mfc0	t1,C0_RAND
+	mfc0	t2,C0_TLBLO
+	MFC0	t3,C0_BADVADDR
+	SREG(t1,R_RANDOM,t0)		/* Random */
+	SREG(t2,R_ENTRYLO,t0)		/* EntryLo */
+	SREG(t3,R_BADVA,t0)		/* BadVA */
+#ifdef R4000
+	mfc0	t1,C0_TLBLO1
+	mfc0	t2,C0_PGMASK
+	mfc0	t3,C0_WIRED
+	SREG(t1,R_ENTRYLO1,t0)		/* TLB EntryLo1 */
+	SREG(t2,R_PGMASK,t0)		/* TLB PageMask */
+	SREG(t3,R_WIRED,t0)		/* TLB Wired */
+	mfc0	t1,C0_WATCHLO
+	mfc0	t2,C0_WATCHHI
+	mfc0	t3,C0_CONFIG
+	SREG(t1,R_WATCHLO,t0)		/* WatchpointLo */
+	mtc0	zero,C0_WATCHLO		/* prevent nested watchpoint */
+	SREG(t2,R_WATCHHI,t0)		/* WatchpointHi */
+	SREG(t3,R_CONFIG,t0)		/* Config */
+	mfc0	t1,C0_LLADDR
+	mfc0	t2,C0_ECC
+	mfc0	t3,C0_TAGLO
+	SREG(t1,R_LLADDR,t0)		/* LLAddr */
+	SREG(t2,R_ECC,t0)		/* ECC */
+	SREG(t3,R_TAGLO,t0)		/* Taglo */
+	mfc0	t1,C0_TAGHI
+	mfc0	t2,C0_CACHEERR
+	mfc0	t3,C0_ERREPC
+#if __mips >= 3
+	MFC0	t4,C0_XCTEXT
+#endif
+	SREG(t1,R_TAGHI,t0)		/* TagHi */
+	SREG(t2,R_CACHERR,t0)		/* CacheErr */
+	SREG(t3,R_ERREPC,t0)		/* ErrorEPC */
+#if __mips >= 3
+	SREG(t4,R_XCONTEXT,t0)		/* XContext */
+#endif
+#endif /* R4000 */
+#endif /* !LR33000 */
+
+	mfc0	t1,C0_CAUSE
+	MFC0	t2,C0_EPC
+	mfc0	t3,C0_SR
+	SREG(t1,R_CAUSE,t0)		/* Cause */
+	SREG(t2,R_EPC,t0)		/* EPC */
+
+#ifdef R4000
+	# save the SR value but clear EXL bit to
+	# reflect state before the exception
+	and	t3,~SR_EXL		# switch off EXL bit
+#else
+	# save the SR value but fixup the KU & IE bits to 
+	# reflect their state before the exception
+	li	t1,0x3f			# KU&IE mask
+	and	t2,t3,t1		# extract KU&IE bits
+	not	t1			# invert the mask
+	and	t3,t1			# clear KU&IE field
+	srl	t2,2			# fixup KU&IE field
+	or	t3,t2			# insert the KU&IE field
+#endif
+	SREG(t3,R_STATUS,t0)		# save Status
+
+#ifdef FLOATINGPT
+	and	t2,t3,SR_CU1
+	beqz	t2,1f
+	nop
+	cfc1	t3,C1_CSR		# flush fpu pipeline
+#if __mips >= 3
+	sdc1	$f0,R_F0*8(t0)
+	sdc1	$f2,R_F2*8(t0)
+	sdc1	$f4,R_F4*8(t0)
+	sdc1	$f6,R_F6*8(t0)
+	sdc1	$f8,R_F8*8(t0)
+	sdc1	$f10,R_F10*8(t0)
+	sdc1	$f12,R_F12*8(t0)
+	sdc1	$f14,R_F14*8(t0)
+	sdc1	$f16,R_F16*8(t0)
+	sdc1	$f18,R_F18*8(t0)
+	sdc1	$f20,R_F20*8(t0)
+	sdc1	$f22,R_F22*8(t0)
+	sdc1	$f24,R_F24*8(t0)
+	sdc1	$f26,R_F26*8(t0)
+	sdc1	$f28,R_F28*8(t0)
+	sdc1	$f30,R_F30*8(t0)
+
+	and	t2,t1,SR_FR
+	beqz	t2,1f
+	nop
+
+	/* SR.FR is set: save the other 16 registers too */
+	sdc1	$f1,R_F1*8(t0)
+	sdc1	$f3,R_F3*8(t0)
+	sdc1	$f5,R_F5*8(t0)
+	sdc1	$f7,R_F7*8(t0)
+	sdc1	$f9,R_F9*8(t0)
+	sdc1	$f11,R_F11*8(t0)
+	sdc1	$f13,R_F13*8(t0)
+	sdc1	$f15,R_F15*8(t0)
+	sdc1	$f17,R_F17*8(t0)
+	sdc1	$f19,R_F19*8(t0)
+	sdc1	$f21,R_F21*8(t0)
+	sdc1	$f23,R_F23*8(t0)
+	sdc1	$f25,R_F25*8(t0)
+	sdc1	$f27,R_F27*8(t0)
+	sdc1	$f29,R_F29*8(t0)
+	sdc1	$f31,R_F31*8(t0)
+#else
+	swc1	$f0,R_F0*4(t0)
+	swc1	$f1,R_F1*4(t0)
+	swc1	$f2,R_F2*4(t0)
+	swc1	$f3,R_F3*4(t0)
+	swc1	$f4,R_F4*4(t0)
+	swc1	$f5,R_F5*4(t0)
+	swc1	$f6,R_F6*4(t0)
+	swc1	$f7,R_F7*4(t0)
+	swc1	$f8,R_F8*4(t0)
+	swc1	$f9,R_F9*4(t0)
+	swc1	$f10,R_F10*4(t0)
+	swc1	$f11,R_F11*4(t0)
+	swc1	$f12,R_F12*4(t0)
+	swc1	$f13,R_F13*4(t0)
+	swc1	$f14,R_F14*4(t0)
+	swc1	$f15,R_F15*4(t0)
+	swc1	$f16,R_F16*4(t0)
+	swc1	$f17,R_F17*4(t0)
+	swc1	$f18,R_F18*4(t0)
+	swc1	$f19,R_F19*4(t0)
+	swc1	$f20,R_F20*4(t0)
+	swc1	$f21,R_F21*4(t0)
+	swc1	$f22,R_F22*4(t0)
+	swc1	$f23,R_F23*4(t0)
+	swc1	$f24,R_F24*4(t0)
+	swc1	$f25,R_F25*4(t0)
+	swc1	$f26,R_F26*4(t0)
+	swc1	$f27,R_F27*4(t0)
+	swc1	$f28,R_F28*4(t0)
+	swc1	$f29,R_F29*4(t0)
+	swc1	$f30,R_F30*4(t0)
+	swc1	$f31,R_F31*4(t0)
+#endif
+2:	SREG(t3,R_FCR,t0)
+	ctc1	zero,C1_CSR
+1:
+#endif /* FLOATINGPT */
+
+	# switch us back to the correct kernel/interrupt mode, but with
+	# all external interrupts masked out.
+	la	k0,_exception		# reset boot exception vector
+	lw	t3,initial_sr
+	and	t3,~SR_IMASK
+	mtc0	t3,C0_SR
+	.set reorder
+
+	la	t0,exception
+	la	sp,stack+STKSIZE-24
+	j	t0
+	.end _exception
+
+	.globl onintr
+	.ent onintr
+/*
+ * Used to install user defined exception handlers.
+ */
+onintr: # a0=exec a1=struct
+	sll	a0,2
+	la	t0,idummy
+	sw	t0,(a1)
+	la	t1,hndlrtbl
+	addu	t1,a0
+	lw	t0,(t1)
+	beq	t0,zero,1f
+	sw	t0,(a1)
+1:	sw	a1,(t1)
+	j	ra
+	.end onintr
+
+	.globl clrhndlrs
+	.ent clrhndlrs
+/*
+ * Used to remove user defined exception handlers.
+ * also recopies exception vector handler.
+ */
+clrhndlrs:
+	subu	sp,24
+	sw	ra,20(sp)
+
+	# remove user defined handlers
+	la	t1,hndlrtbl
+	li	t2,0
+	li	t3,32
+1:	sll	t0,t2,2
+	addu	t0,t1
+	sw	zero,(t0)
+	addu	t2,1
+	bne	t2,t3,1b
+
+	# recopy the handler
+	la      a0,handler
+	la      a1,ehandler
+	li      a2,0x0000000           # utlb miss
+	jal     copyHandler
+#ifdef LR33000
+	li      a2,0x0000040           # debug 
+	jal     copyHandler
+#endif
+	li      a2,0x0000080           # general/r4000 xtlb vector
+	jal     copyHandler
+#ifdef R4000
+	li	a2,0x0000180		# r4000 general
+	jal     copyHandler
+
+	la      a0,cerrhandler
+	la      a1,ecerrhandler
+	li	a2,0x0000100		# r4000 cache error
+	jal     copyHandler
+#endif
+
+	li	a0,ICACHE
+	jal	flush_cache
+
+	lw	ra,20(sp)
+	addu	sp,24
+	j	ra
+	.end clrhndlrs
+
+	.globl clienttos
+	.ent clienttos
+/*
+ * This routine returns the correct top-of-stack value.
+ * Used by C routines, when they need to set the client stack pointer.
+ */
+clienttos:
+	lw	v0,memorysize
+	addu	v0,K0BASE
+	and	v0,~7 			# double word align
+	subu	v0,24			# make room for a0-a3..
+	j	ra
+	.end clienttos
+
+	.globl clr_iec
+	.ent clr_iec
+/*
+ * This is used make sure that interrupts are disabled.
+ */
+clr_iec:
+	.set noreorder
+	mfc0	t0,C0_SR
+	nop
+#ifdef R4000
+	and	t0,~(SR_IE | SR_EXL | SR_ERL)
+#else
+	and	t0,~SR_IEC
+#endif
+	mtc0	t0,C0_SR
+	.set reorder
+	j	ra
+	.end clr_iec
+
+	.globl bis_sr
+	.ent bis_sr
+/*
+ * Set bits in status register, returning old value
+ */
+bis_sr:
+	.set noreorder
+	mfc0	v0,C0_SR
+	nop
+#ifdef R4000
+	nop
+#endif
+	or	a0,v0
+	mtc0	a0,C0_SR
+	.set reorder
+	j	ra
+	.end bis_sr
+
+
+	.globl bic_sr
+	.ent bic_sr
+/*
+ * Clear bits in status register, returning old value
+ */
+bic_sr:
+	.set noreorder
+	mfc0	v0,C0_SR
+#ifdef R4000
+	nop
+#endif
+	not	a0
+	and	a0,v0
+	mtc0	a0,C0_SR
+	.set reorder
+	j	ra
+	.end bic_sr
+
+	.globl set_sr
+	.ent set_sr
+/*
+ * Set status register, returning old value
+ */
+set_sr:
+	.set noreorder
+	mfc0	v0,C0_SR
+	mtc0	a0,C0_SR
+	.set reorder
+	j	ra
+	.end set_sr
+
+/*
+ * Used to enable coprocessor 1 (the FPU)
+ */
+	.globl enableCU1
+	.ent enableCU1
+enableCU1:
+	.set noreorder
+	mfc0	t0,C0_SR
+	nop
+	or	v0,t0,SR_CU1
+	mtc0	v0,C0_SR
+
+	# stuff pattern into f0 and f1
+	li	t1,0xaaaa5555
+#ifdef R4000
+	nop
+#endif
+
+	mtc1	t1,$f0
+	mtc1	zero,$f1
+
+	# retrieve pattern
+	mfc1	t2,$f0
+	mfc1	t3,$f1
+	.set reorder
+
+	# check pattern
+	bne	t1,t2,1f
+	bne	zero,t3,1f
+
+	# OK we have got an fpu, initialise CSR and save ID
+ 	cfc1	t1,C1_FRID
+	ctc1	zero,C1_CSR
+	la	t2,DBGREG
+ 	SREG(t1,R_FID,t2)
+	j	ra
+
+1:	mtc0	t0,C0_SR
+	move	v0,t0
+	j	ra
+	.end enableCU1
+
+        .globl copyHandler
+	.ent copyHandler
+/*
+ * Used to copy the exception handler to the various
+ * vector addresses.
+ */
+copyHandler:
+	# a0=src a1=end a2=dst
+	# must not change a0 or a1
+	# must force a0 & a1 to kseg1
+	or      t0,a0,K1BASE
+	or      t1,a1,K1BASE
+	or      a2,K1BASE
+1:      lw      v0,(t0)
+	sw      v0,(a2)
+	addu    t0,4
+	addu    a2,4
+	bltu    t0,t1,1b
+	j       ra
+	.end copyHandler
+
+
+#ifdef R4000
+/* save registers just below general exception handler */
+#define V0_SAVE	+(0x180-40)
+#define A0_SAVE	+(0x180-32)
+#define A1_SAVE	+(0x180-24)
+#define A2_SAVE	+(0x180-16)
+#define AT_SAVE	+(0x180-8)
+
+	.comm	cerrcount,4
+
+	.globl	cerrhandler
+	.ent	cerrhandler
+cerrhandler:
+	.set	noat
+	sw	AT,AT_SAVE(zero)
+	sw	v0,V0_SAVE(zero)
+	.set	at
+	la	v0,cache_err
+	or	v0,K1BASE
+	j	v0
+	# end of low-memory vector
+ecerrhandler:
+
+cache_err:
+	.set	noreorder
+	mfc0	v0,C0_CACHEERR	
+	sw	a0,A0_SAVE(zero)
+	sw	a1,A1_SAVE(zero)
+	sw	a2,A2_SAVE(zero)
+	mfc0	a2,C0_TAGLO		# save taglo
+	.set	reorder
+
+	and	a0,v0,CACHEERR_BUS	# sysAD bus error?
+	bnez	a0,mem_err
+
+	and	a0,v0,CACHEERR_LEVEL	# secondary cache error?
+	bnez	a0,scache_err
+
+pcache_err:
+	# cache error is in one or both primary caches
+	# generate cache address to use for cacheops
+	and	a0,v0,CACHEERR_SIDX_MASK & ((1<<CACHEERR_PIDX_SHIFT)-1)
+	and	a1,v0,CACHEERR_PIDX_MASK
+	sll	a1,CACHEERR_PIDX_SHIFT
+	or	a0,a1			# a0 = primary cache index
+	addu	a0,K0BASE
+
+	/* determine which cache */
+	and	a1,v0,CACHEERR_TYPE
+	bnez	a1,pdcache
+
+picache:
+	/* zap primary instruction cache line */
+	.set	noreorder
+	mtc0	zero,C0_TAGLO
+	nop
+        cache   Index_Store_Tag_I,0(a0)
+	.set	reorder
+	and	a1,v0,CACHEERR_BOTH	# data error too?
+	beqz	a1,fixed		# no - all done
+
+pdcache:
+	/* give up on a dirty line */
+	.set	noreorder
+        cache   Index_Load_Tag_D,0(a0)
+	nop; nop; nop
+	mfc0	a1,C0_TAGLO
+	nop; nop
+	and	a1,1<<TAG_PSTATE_SHIFT
+	bnez	a1,giveup
+	nop
+
+	/* clean line: we can safely zap it */
+	mtc0	zero,C0_TAGLO
+	nop
+        cache   Index_Store_Tag_D,0(a0)
+	nop; nop			# clear pipeline
+
+fixed:	
+	la	a0,cerrcount
+	lw	a1,(a0)
+	addu	a1,1
+	sw	a1,(a0)
+
+	mtc0	a2,C0_TAGLO	 	# restore taglo
+	lw	a2,A2_SAVE(zero)
+	lw	a1,A1_SAVE(zero)
+	lw	a0,A0_SAVE(zero)
+	lw	v0,V0_SAVE(zero)
+	.set	noat
+	lw	AT,AT_SAVE(zero)
+	eret
+	nop
+	.set	reorder
+	.set	at
+
+scache_err:
+mem_err:
+giveup:	
+	.set	noreorder
+	mfc0	a0,C0_ERREPC
+	.set	reorder
+	li	a1,EXC_CP2		# XXX cheat XXX 
+	move	a2,ra
+	move	a3,v0
+
+	# make sure we stay uncached, even if linked in kseg0
+	.set	noreorder
+	mfc0	t1,C0_CONFIG
+	nop
+	and	t1,~CFG_K0MASK
+	or	t1,CFG_C_UNCACHED
+	mtc0	t1,C0_CONFIG
+	.set	reorder
+
+	b	__bev_fail
+	.end	cerrhandler
+
+
+	.globl	set_count
+	.ent	set_count
+set_count:
+	.set	noreorder
+	mtc0	a0,C0_COUNT
+	.set	reorder
+	j	ra
+	.end	set_count
+
+	.globl	get_count
+	.ent	get_count
+get_count:
+	.set	noreorder
+	mfc0	v0,C0_COUNT
+	.set	reorder
+	j	ra
+	.end	get_count
+
+	.globl	set_compare
+	.ent	set_compare
+set_compare:
+	.set	noreorder
+	mtc0	a0,C0_COMPARE
+	.set	reorder
+	j	ra
+	.end	set_compare
+
+	.globl	get_compare
+	.ent	get_compare
+get_compare:
+	.set	noreorder
+	mfc0	v0,C0_COMPARE
+	.set	reorder
+	j	ra
+	.end	get_compare
+
+#endif /* R4000 */
+
+	.globl	get_cause
+	.ent	get_cause
+get_cause:
+	.set	noreorder
+	mfc0	v0,C0_CAUSE
+	.set	reorder
+	j	ra
+	.end	get_cause
+
+/*
+ * This is used by onintr to terminate the list of user defined handlers
+ * for a given EXC value.
+ */
+	.data
+idummy:	.word	0
+	.word	exc2
+
+

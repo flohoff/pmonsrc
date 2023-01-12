@@ -1,0 +1,176 @@
+/* $Id: 00-README,v 1.3 1999/05/13 11:45:05 nigel Exp $ */
+
+25/Jan/1995
+
+This release is a snapshot of Algorithmics' port of LSI Logic's PMON
+prom monitor.  It comes with a number of caveats:
+
+1) It will currently build for Algorithmics P-4000i board (also
+   available as the IDT 79S460), LSI's Pocket Rocket board and
+   IDT's 79RS385 board.
+
+   We intend to support a larger range of our own boards, and others,
+   very shortly.
+
+2) It is configured to be built by Algorithmics SDE-MIPS compiler, and
+   GNU make.  We can make no guarantees about its use of any other
+   tool-chain.  In particular the 64-bit R4000 support code requires
+   SDE-MIPS version 2.0 (R3000 or 32-bit only versions should be
+   buildable using the previous SDE-MIPS release 1.4).
+
+Having installed this source tree in a directory of your choice, you
+must set environment variable $LSIPKG to the full pathname of
+the top of the source tree. E.g
+
+	% setenv LSIPKG /homes/joe/pmonsrc
+
+Then, to build for PMON for the P4032 board (for example)
+
+	% sde-make PMONDIRS=P4032
+
+There now follows a quick guided tour of the directory structure:
+
+$LSIPKG/
+
+	Typing "sde-make" in this top directory will build a version of
+	PMON for the P4000i board (the list of boards is specified by
+	the PMONDIRS variable in $LSIPKG/pmon/Makefile, the list of CPU
+	types is in $LSIPKG/lib/Makefile).  This directory contains
+	the following important files;
+
+	Makefile - the top level makefile.
+
+	defines.mk - specifies the compiler, assembler and associated flags.
+
+	R4000.mk - defines CPU specific compilation options for R4000
+	
+	R3000.mk - defines CPU specific compilation options for R3000
+
+	LR33K.mk - defines CPU specific compilation options for LR330x0
+
+
+$LSIPKG/include
+
+	Include files used by PMON and its associated library routines.
+
+$LSIPKG/lib 
+	
+	All C library routines used by PMON, plus utilities like cache
+	handling.  Originally this was supplied by LSI Logic in a form
+	which could be used with other standalone programs: this is
+	not used or supported by our build mechanism, and it used as
+	part of PMON only.  
+	
+$LSIPKG/lib/R4000
+	
+	Directory in which R4000 version of the PMON C library is built.
+
+$LSIPKG/lib/R3000
+	
+	Directory in which R3000 version of the PMON C library is built.
+
+$LSIPKG/lib/LR33K
+	
+	Directory in which LR330x0 version of the PMON C library is built.
+
+$LSIPKG/pmon
+
+	The source code of the PMON monitor.
+
+$LSIPKG/pmon/algcommon
+	
+	Platform-specific code common to all Algorithmics boards.
+
+$LSIPKG/pmon/algvme
+
+	Platform-specific code for Algorithmics VMEbus boards.
+	(This needs further work before it will build).
+
+$LSIPKG/pmon/p4000
+
+	Platform-specific code for Algorithmics P4000 board.
+
+$LSIPKG/pmon/p4032
+
+	Platform-specific code for Algorithmics P4032 board.
+
+$LSIPKG/pmon/p5064
+
+	Platform-specific code for Algorithmics P5064 board.
+
+$LSIPKG/pmon/lsipr
+
+	Platform-specific code for LSI Logic's Pocket Rocket board.
+	(This needs further work before it will build).
+
+etc.
+
+$LSIPKG/pmon/P4000
+
+	Directory in which the final PMON executable (ready to
+	download to PROM) for Algorithmics P4000 board is built.
+
+$LSIPKG/pmon/VME4000
+
+	Directory in which the final PMON executable for Algorithmics
+	VME4000 board is built.
+
+$LSIPKG/pmon/LSIPR
+
+	Directory in which the final PMON executable for LSI Logic's
+	Pocket Rocket board is built.
+
+$LSIPKG/pmon/P4032
+
+	Directory in which the final PMON executable for Algorithmics
+	P4032 board is built.
+
+$LSIPKG/pmon/P5064
+
+	Directory in which the final PMON executable for Algorithmics
+	P5064 board is built.
+
+etc.
+
+$LSIPKG/tools
+
+	Contains the "newversion" shell script, which increments a
+	version number on each rebuild.
+
+$LSIPKG/net/sys
+
+	The directories below here reflect the NetBSD.2 kernel
+	organisation.  The network and socket code is largely
+	unchanged, but the "kernel" has been replaced by a simple
+	emulation which runs one "process" at a time to completion.
+
+$LSIPKG/net/sys/R4000
+	
+	Directory to hold the R4000 version of the network kernel library.
+
+$LSIPKG/net/libc
+
+	Key network related portions of the NetBSD.2 C library.
+
+$LSIPKG/net/libc/R4000
+
+	Directory to hold the R4000 version of the network C library.
+
+$LSIPKG/net/cmd
+
+	Command/Application level network code (e.g. network
+	configuration, TFTP file i/o, network bootstrap, ping.
+	
+$LSIPKG/net/cmd/R4000
+
+	Directory to hold the R4000 version of the network "commands" library.
+
+$LSIPKG/net/include
+
+	Selection of user-level header files from NetBSD.2.
+
+
+So you can see that to port PMON to a new board "foobar", you need to create 
+new directories $LSIPKG/pmon/foobar, containing the board-specific source code
+and $LSIPKG/pmon/FOOBAR, which will hold the binaries.  On Windows, which has
+case-insensitive file names, this is likely to cause some confusion.  Sorry.

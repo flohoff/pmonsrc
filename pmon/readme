@@ -1,0 +1,73 @@
+
+			LSI Logic Prom Monitor 
+			Release Notice v2.6 		Jul 7 1992
+
+
+Enhancements and Bug Fixes
+
+	Support has been added for MIPS-based DecSations and MIPS cross
+	tools on a SparcStation. Use the `Install' script to specify
+	the appropriate configuration.
+
+	Support has been added for the LR33050 and the LR33020. This
+	is enabled with compile-time switches, and should be selected
+	in the file defines.mk.
+
+	The HI and LO registers have been added to the "r *" display.
+
+	pmcc now generates fast-mode records by default, if you
+	need S-records, use the the -srec option.
+
+	A checksum has been added to the fast-mode records. To suppress
+	the generation of a checksum record, invoke genFrec with the -c
+	option. This is necessary when creating a fast-mode record file
+	that is to be downloaded to a pre- 3.00 version of PMON.
+
+	When generating fast-mode records, the bss section is no
+	longer downloaded by default. To include bss in the download,
+	use the -b option with genFrec.
+
+	PMON and pmcc now support fast-mode records when using little
+	endian byte ordering.
+
+	The terminating S-record (S7) now has the correct checksum.
+
+	Support for input files has been added, see example/filetst.c.
+	The files are placed at the top of memory, and the stackpointer
+	to move down accordingly. It does not support redirecting stdin
+	to a file.
+
+	The program genBrec has been deleted, to create a binary memory
+	image from a coff file, use "genSrec -b".
+
+	To support programs which require a large stack, the client
+	stackpointer is now set to the top of memory, rather than to an
+	area inside PMON's workspace.
+
+	PMON now sizes memory after reset. However, memory contents
+	are not changed as part of this operation.
+
+	PMON now detects the presence of an floating-point coprocessor.
+	If found, PMON enables the coprocesor and the floating-point
+	exception input. Note that PMON will not enable the FPU if the
+	CpCond1 input pin is not tied low.
+
+	The 'g' command now has a -t option that times the execution
+	of the client program. Setting the -t option causes the client
+	to be invoked with argv[0] as "t", instead of the default "g".
+	Unfortunately, because of a bug in earlier versions of PMON,
+	this means that a program built using the 3.0 version of pmcc,
+	will not run under pre-3.0 versions of PMON, unless the "-c"
+	option is added to the 'g' command.
+
+	Numerous command options have been added. Use 'h *' to review
+	the new command list.
+
+	The programs in the tools directory will now display a brief
+	explanation of their options if invoked with -h.
+
+
+
+Known Problems
+
+	None

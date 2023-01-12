@@ -1,0 +1,227 @@
+/* $Id: keybd.c,v 1.2 1996/01/16 14:17:00 chris Exp $ */
+#include <mips.h>
+
+/* 
+ * Simple (polled) driver for PS2 keyboard port on LR33020 
+ * The code to light the LEDs on the keyboard doesn't work, and has
+ * therefore been disabled.
+ */
+
+#define FOOBAR
+
+/* key scan codes */
+#define NUM_LOCK   0x77
+#define CAPS_LOCK  0x58
+#define LSHIFT	   0x12
+#define RSHIFT	   0x59
+#define CTRL_KEY   0x14
+#define BRK_PRFX   0xf0		/* prefix code sent on key release (break) */
+
+#define SCROLL_LED 0x01
+#define NUM_LED    0x02
+#define CAPS_LED   0x04
+
+/* convert scan codes to ascii non shifted */
+char u_keycode[] = {
+/* 00 */ 0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x4d,
+/* 08 */ 0x42,0x20,0x20,0x20,0x20,0x09,0x60,0x3c,
+/* 10 */ 0x20,0x00,0x20,0x20,0x20,0x71,0x31,0x3e,
+/* 18 */ 0x20,0x20,0x7a,0x73,0x61,0x77,0x32,0x3f,
+/* 20 */ 0x20,0x63,0x78,0x64,0x65,0x34,0x33,0x00,
+/* 28 */ 0x20,0x20,0x76,0x66,0x74,0x72,0x35,0x00,
+/* 30 */ 0x20,0x6e,0x62,0x68,0x67,0x79,0x36,0x00,
+/* 38 */ 0x20,0x21,0x6d,0x6a,0x75,0x37,0x38,0x00,
+/* 40 */ 0x20,0x2c,0x6b,0x69,0x6f,0x30,0x39,0x0a,
+/* 48 */ 0x20,0x2e,0x2f,0x6c,0x3b,0x70,0x2d,0x2f,
+/* 50 */ 0x20,0x20,0x27,0x20,0x5b,0x3d,0x2a,0x25,
+/* 58 */ 0x20,0x00,0x0d,0x5d,0x20,0x5c,0x20,0x30,
+/* 60 */ 0x49,0x45,0x32,0x55,0x09,0x54,0x08,0x08,
+/* 68 */ 0x20,0x44,0x20,0x53,0x41,0x50,0x52,0x4f,
+/* 70 */ 0x4c,0x20,0x4b,0x4a,0x20,0x48,0x1b,0x47,
+/* 78 */ 0x20,0x2b,0x20,0x2d,0x2a,0x22,0x3a,0x20
+	};
+
+/* convert scan codes to ascii shifted */
+char s_keycode[] = {
+/* 00 */ 0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,
+/* 08 */ 0x20,0x20,0x20,0x20,0x20,0x09,0x7e,0x20,
+/* 10 */ 0x20,0x00,0x20,0x20,0x20,0x51,0x21,0x20,
+/* 18 */ 0x20,0x0a,0x5a,0x53,0x41,0x57,0x40,0x20,
+/* 20 */ 0x20,0x43,0x58,0x44,0x45,0x24,0x23,0x20,
+/* 28 */ 0x20,0x2f,0x56,0x46,0x54,0x52,0x25,0x20,
+/* 30 */ 0x20,0x4e,0x42,0x48,0x47,0x59,0x5e,0x20,
+/* 38 */ 0x20,0x2a,0x4d,0x4a,0x55,0x26,0x2a,0x20,
+/* 40 */ 0x20,0x3c,0x4b,0x49,0x4f,0x29,0x28,0x20,
+/* 48 */ 0x20,0x3e,0x3f,0x4c,0x3a,0x50,0x5f,0x20,
+/* 50 */ 0x20,0x20,0x22,0x20,0x7b,0x2b,0x20,0x20,
+/* 58 */ 0x20,0x00,0x0d,0x7d,0x20,0x7c,0x20,0x20,
+/* 60 */ 0x49,0x00,0x20,0x00,0x00,0x00,0x08,0x00,
+/* 68 */ 0x20,0x00,0x69,0x00,0x79,0x66,0x00,0x6e,
+/* 70 */ 0x69,0x00,0x66,0x6e,0x20,0x49,0x1b,0x00,
+/* 78 */ 0x20,0x2b,0x20,0x2d,0x2a,0x69,0x6e,0x20
+	};
+
+int led_state;
+int sh_state;
+int ctrl_state;
+
+/*************************************************************
+*  main()
+*/
+main()
+{
+int c;
+
+initkeybd();
+for (;;) {
+	c = getch();
+	if (c == '\r') c = '\n';
+	if (isprint(c) || c == '\n' || c == '\b' || c == '\t') putchar(c);
+	else printf("^%c",c|0x40);
+	}
+}
+
+/*************************************************************
+*  initkeybd()
+*/
+initkeybd()
+{
+int i,c;
+
+wrpscomm(0xff,0);	/* clear all bits */
+
+/* make sure the rx buffer is empty */
+while (cfc2(C2_PSSTAT) & PSSTAT_RXBF) mfc2(C2_PSRCVB);
+
+#ifdef FOOBAR
+/* issue the reset command */
+putkeybd(0xff); if ((c=getkeybd()) != 0xfa) printf("[0%02x]",c);
+
+/* signal acceptance of the ACK */
+wrpscomm(0,PSCOMM_CLKINH);
+for (i=0;i<14000;i++) /* delay at least 500 usecs */ ;
+wrpscomm(PSCOMM_CLKINH,0);
+
+/* wait for completion of the BAT */
+if ((c=getkeybd()) != 0xaa) printf("[1%02x]",c);
+#endif
+}
+
+/*************************************************************
+*  getch()
+*/
+getch()
+{
+int c,prev;
+
+prev = 0;
+for (;;) {
+	c = getkeybd();
+	if (c == BRK_PRFX || c == 0xe0) ;
+	else if (c == LSHIFT || c == RSHIFT) {
+		if (prev == BRK_PRFX) sh_state = 0; 
+		else sh_state = 1;
+		}
+	else if (c == CTRL_KEY) {
+		if (prev == BRK_PRFX) ctrl_state = 0; 
+		else ctrl_state = 1;
+		}
+	else if (prev == BRK_PRFX) ;
+	else if (c == CAPS_LOCK) {
+		if (led_state&CAPS_LED) {
+			led_state &= ~CAPS_LED;
+			setleds(led_state);
+			}
+		else {
+			led_state |= CAPS_LED;
+			setleds(led_state);
+			}
+		}
+	else if (c == NUM_LOCK) {
+		if (led_state&NUM_LED) {
+			led_state &= ~NUM_LED;
+			setleds(led_state);
+			}
+		else {
+			led_state |= NUM_LED;
+			setleds(led_state);
+			}
+		}
+	else {
+		if (sh_state == 1) c = s_keycode[c];
+		else c = u_keycode[c];
+		if (ctrl_state == 1) {
+			if (c == '-') c = '_';
+			else if (c == '2') c = '@';
+			else if (c == '6') c = '^';
+			c &= 0x1f;
+			}
+		if (isalpha(c) && led_state&CAPS_LED) {
+			if (sh_state == 1) c |= 0x20;
+			else c &= ~0x20;
+			}
+		return(c);
+		}
+	prev = c;
+	}
+}
+
+/*************************************************************
+*  setleds(n)
+*/
+setleds(n)
+int n;
+{
+int c;
+
+#ifdef FOOBAR
+putkeybd(0xed); if ((c=getkeybd()) != 0xfa) printf("[2%02x]",c);
+putkeybd(n); if ((c=getkeybd()) != 0xfa) printf("[3%02x]",c);
+#endif
+}
+
+/*************************************************************
+*  getkeybd()
+*/
+getkeybd()
+{
+int c;
+
+while (!(cfc2(C2_PSSTAT) & PSSTAT_RXBF)) ;
+c = mfc2(C2_PSRCVB)&0xff;
+
+return(c);
+}
+
+/*************************************************************
+*  putkeybd(c)
+*/
+putkeybd(c)
+int c;
+{
+int i;
+
+while (!(cfc2(C2_PSSTAT) & PSSTAT_TXBE)) ;  /* wait while TX buf not empty */
+while (cfc2(C2_PSSTAT) & PSSTAT_RXIN) ;     /* wait while RX not busy */
+mtc2(C2_PSTXBWE,c); mtc2(C2_PSTXB,c);	    /* load TX buf */
+wrpscomm(0,PSCOMM_CLKINH); 		    /* set CLKINH */
+for (i=0;i<1000;i++) ;			    /* wait a while */
+wrpscomm(PSCOMM_CLKINH,PSCOMM_TXEN);	    /* clear CLKINH, set TXEN */
+while (!(cfc2(C2_PSSTAT) & PSSTAT_TXBE)) ;  /* wait while TX buf not empty */
+wrpscomm(PSCOMM_TXEN,0);		    /* clear TXEN */
+}
+
+/*************************************************************
+*  wrpscomm(clr,set)
+*/
+wrpscomm(clr,set)
+int clr,set;
+{
+int t;
+t = cfc2(C2_PSCOMM); 
+t &= ~clr; 
+t |= set;
+ctc2(C2_PSCOMMWE,t); 
+ctc2(C2_PSCOMM,t);
+}
+

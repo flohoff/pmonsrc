@@ -1,0 +1,93 @@
+#!/usr/local/bin/perl -w
+# $Id: GenTarList,v 1.5 1996/05/22 12:21:38 chris Exp $
+
+require 'getopts.pl';
+
+sub usage {
+    print stderr "usage: GenTarList [-d] [-r] [-b] [-t tarfile.tgz]\n";
+    print stderr "\t-d: enable debug\n";
+    print stderr "\t-r: include RCS/CVS files\n";
+    print stderr "\t-b: include binary files\n";
+    print stderr "\t-t: auto generate gzipped tar file\n";
+    exit 1;
+};
+
+# subdirectories of pmon/pmon that we always supply
+@subdirs = ("idt385", "lsipr", "p4000", "p4032", "algcommon", "alvgme", "pci");
+$allowall = 0;
+
+$pat = "";
+$opt_d = $opt_r = $opt_b = $opt_t = 0;
+&usage () if (! &Getopts('drbt:'));
+if  ($#ARGV >= 0) {
+    $pat = join(' ',@ARGV) ;
+    $allowall = 1;
+}
+
+chdir "..";
+$pat = "pmon/$pat/*";
+$pat =~ s/\/\//\//g;
+
+print "file pattern $pat\n" if ($opt_d);
+
+if ($opt_t) {
+    open (GTAR, "| gtar -c -z -T - -f $opt_t") || die ("failed to start gtar: $!\n");
+    select (GTAR);
+}
+
+open (LS, "ls -RF $pat|") || die ("failed to start ls: $!\n");
+
+$dir="";
+while(<LS>) {
+    chop;
+    print "<$_>\n" if ($opt_d);
+
+    next if (/\/$/);		# skip directories
+    s/[*@]$//;			# remove other markers
+
+    if (/\:$/) {		# deal with directory changes
+	s/://;
+	$dir = $_."/";
+	$dir =~ s/\/\.\//\//;
+	$dir =~ s/\/\//\//;
+	next;
+    }
+
+    next if (/^\s*$/);			# blank lines
+    next if (/~$/);			# emacs backup files
+    next if (/^u?pmon-.*/ && $dir =~ /[BL][GO]\/$/); # old binary images
+    next if (/^u?pram-.*/ && $dir =~ /[BL][GO]\/$/); # old binary images
+    next if ($dir =~ /^pmon\/examples/);	# examples directory
+
+    next if (/MADE/);			# more junk files
+    next if (/TAGS/);			# more junk files
+    next if (/^,/);			# more junk files
+    next if (/GenTarList/);
+
+    # treat subdirectories of pmon/pmon carefully 
+    if ($dir =~ /pmon\/pmon\/./) {
+	$isok = 0;
+	foreach $okdir (@subdirs) {
+	    if ($dir =~ /$okdir/i) {
+		$isok = 1;
+		last;
+	    }
+	}
+	print "$dir $isok\n" if $opt_d;
+	next if !$isok;
+    }
+
+    if (!$opt_r) {
+	next if ($dir =~ /RCS/);	# RCS directories
+	next if ($dir =~ /CVS/);	# CVS directories
+	next if (/,v/);			# RCS files
+    }
+
+    if (!$opt_b) {
+	next if (/.o$/);		# object modules
+	next if (/.a$/);		# libraries
+	next if ($dir =~ /[BL][GO]\/$/); # binary directories
+    }
+
+    print "./$dir$_\n";
+}

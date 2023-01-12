@@ -1,0 +1,229 @@
+
+/*
+ * CIRRMS.S: low level code for CIR's RMS board
+ * Copyright (c) 1994 Algorithmics Ltd.
+ */
+
+#include <mips/asm.h>
+#include <mips/cpu.h>
+
+/* could be any idt processor */
+#include <idt/r3041.h>
+#include <idt/r3081.h>
+
+	.sdata
+EXPORTS(fpa_intr,4)
+	.word	5		# Use IP5 on R3081
+
+
+/*
+ * Intel M82510 driver 
+ */
+#define DUARTA		0xbf200000
+#define DUARTB		0xbf400000
+#define CLK		4915200		/* clock freq: 4.9152 MHz */
+
+#include "m82510.h"
+
+	.rdata
+_m8_inittab:
+	.byte	BANK, BANK_WRK 				/* select work bank */
+	.byte	WRK_ICM, ICM_SRST			/* software reset */
+	.byte	WRK_TCM, TCM_TXDI			/* disable Tx */
+	.byte	WRK_RCM, RCM_RXDI			/* disable Rx */
+
+	.byte	BANK, BANK_MCFG				/* select modem cfg bank */
+	.byte	MCFG_CLCF, CLCF_RXCS | CLCF_TXCS 	/* 16x BRGA clock */
+	.byte	MCFG_BBCF, BBCF_BBCS_CLOCK		/* BRGB is timer */
+	.byte	MCFG_BACF, BACF_BACS_CLOCK | BACF_BAM	/* BRGA is BRG */
+	.byte	MCFG_MIE, 0				/* no modem interrupts */
+
+	.byte	BANK, BANK_GCFG				/* select work bank */
+	.byte	GCFG_IMD, IMD_IAM | IMD_RFD_4		/* auto iack; 4-deep fifo */
+	.byte	GCFG_FMD, (3 << FMD_TFT_SHIFT) | (0 << FMD_RFT_SHIFT)
+	.byte	GCFG_RIE, 0				/* no rx interrupts */
+
+	.byte	BANK, BANK_NAS				/* select 8250 bank */
+	.byte	NAS_LCR, LCR_DLAB
+	.byte	NAS_BAL, BRTC(CLK,CONSPEED) & 0xff
+	.byte	NAS_BAH, BRTC(CLK,CONSPEED) >> 8
+	.byte	NAS_LCR. LCR_PARNONE | LCR_CL8		/* no parity: 8 bits/char */
+
+	.byte	BANK, BANK_WRK				/* select work bank */
+	.byte	WRK_TCM, TCM_TXEN			/* enable Tx */
+	.byte	WRK_RCM, RCM_RXEN			/* enable Rx */
+
+	.byte	255,255
+
+
+	.text
+LEAF(_m8_initchan)
+1:	lbu	$t0,0($a1)
+	lbu	$t1,1($a1)
+	addu	$a1,2		# advance pointer
+	beq	$t0,255,2f	# table done?
+	addu	$t0,$a0		# add uart base and write register
+	sb	$t1,($t0)
+	b	1b
+2:	j	$ra
+END(_m8_initchan)
+
+
+LEAF(_m8_init)
+	la	$a0,DUARTA
+	la	$a1,_m8_inittab
+	addu	$a1,$s8		# relocate
+	b	_m8_initchan
+END(_m8_initchan)
+
+
+/*
+ * void dbg_init (void)
+ * Reset and initialise the debug port.
+ * Available regs: standard C conventions.
+ */
+LEAF(dbg_init)
+	la	$a0,DUARTB
+	la	$a1,_m8_inittab
+	b	_m8_initchan
+END(dbg_init)
+
+
+/*
+ * Send character in a0 to ROM console device.
+ * Available regs: a0,v0,v1 ONLY.
+ */
+LEAF(rom_outch)
+	la	$v0,DUARTA
+1:	lbu	$v1,WRK_GSR($v0)
+	and	$v1,GSR_TFIR
+	beqz	$v1,1b
+	sb	$a0,WRK_DAT($v0)
+	j	$ra
+END(rom_outch)
+
+
+/*
+ * Read character from ROM console device, return in v0.
+ * Busy wait for input.
+ * Available regs: a0,v0,v1 ONLY.
+ */
+LEAF(rom_inch)
+	la	$v0,DUARTA
+1:	lbu	$v1,WRK_GSR($v0)
+	and	$v1,GSR_RFIR
+	beqz	$v1,1b
+	lbu	$v0,WRK_DAT($v0)
+	j	$ra
+END(rom_inch)
+
+
+/*
+ * void dbg_outch(char c)
+ * Write character in a0 to debug port.
+ * Available regs: standard C conventions.
+ */
+LEAF(dbg_outch)
+	la	$v0,DUARTB
+1:	lbu	$v1,WRK_GSR($v0)
+	and	$v1,GSR_TFIR
+	beqz	$v1,1b
+	sb	$a0,WRK_DAT($v0)
+	j	$ra
+END(dbg_outch)
+
+	
+/*
+ * int dbg_inch(void)
+ * Return next input character from debug port in v0.
+ * Available regs: standard C conventions.
+ */
+LEAF(dbg_inch)
+	la	$v0,DUARTB
+1:	lbu	$v1,WRK_GSR($v0)
+	and	$v1,GSR_RFIR
+	beqz	$v1,1b
+	lbu	$v0,WRK_DAT($v0)
+	j	$ra
+END(dbg_inch)
+
+
+/* 
+ * Include standard memory test/clear code.
+ */
+#include "memprobe.s"
+
+/*
+ * Basic board initialisation, called straight from RESET
+ * if linked for ROM usage.
+ */
+LEAF(rom_reset)
+	move	$s7,$ra
+
+	/* initialise status register to SR_BEV (setting SR_PE clears it) */
+	li	$a0,SR_BEV|SR_PE
+	mtc0	$a0,$sr
+	mtc0	$zero,$cr
+
+#if 0
+	/* r3041: initialise bus control register */
+	li	$a0,BUSC_LOCK | BUSC_SET |			\
+			(BUSC_CTL_WR   << BUSC_MEM_SH) |	\
+			(BUSC_CTL_RDWR << BUSC_ED_SH) |		\
+			(BUSC_CTL_RDWR << BUSC_IO_SH) |		\
+			BUSC_BE16 | BUSC_BE | BUSC_BTA_0;
+	mtc0	$a0,$busctrl
+
+	/* r3041: set portsize register (all 32-bit) */
+	li	$a0,PRTSZ_LOCK
+	mtc0	$a0,$portsize
+
+	/* r3041: set cacheconfig register (data block refill on) */
+	mfc0	$a0,$cachecfg	# dont upset r3081 $config register
+	or	$a0,CCFG_DBR
+	mtc0	$a0,$cachecfg
+#endif
+
+	/* initialise DUART */
+	bal	_m8_init
+
+	/* XXX THIS MAY NEED WRITING XXX */
+	/* switch on DRAM */
+	/* switch on Refresh */
+	/* XXX END */
+
+	/* determine memory size */
+	bal	size_mem
+
+	/* no need to clear mem, it has no parity/ecc */
+
+	/* return to generic reset, with memory size */
+	move	$ra,$s7
+	j	$ra
+END(rom_reset)
+
+/*
+ * Include linkages to PMON prom routines
+ */
+
+#define TBLBASE	0xbfc00500
+
+#define TBLENTRY(n,m)			\
+LEAF(m);				\
+	li	$t0,TBLBASE+(4*n);	\
+	lw	$t0,($t0);		\
+	j	$t0;			\
+END(m)
+
+TBLENTRY(0,prom_read)
+TBLENTRY(1,prom_write)
+TBLENTRY(2,prom_open)
+TBLENTRY(3,prom_close)
+TBLENTRY(4,prom_ioctl)
+TBLENTRY(5,prom_printf)
+TBLENTRY(6,prom_vsprintf)
+TBLENTRY(7,prom_ttctl)
+TBLENTRY(8,prom__exit)
+TBLENTRY(9,prom_getenv)
+TBLENTRY(10,prom_onintr)
+TBLENTRY(11,prom_flush_cache)

@@ -1,0 +1,14 @@
+# $Id: newvers,v 1.2 1996/01/16 14:25:30 chris Exp $
+#! /bin/sh
+#
+
+if [ ! -w version ]; then rm -f version; echo 0.0.0 > version; fi
+
+awk -F. "NR == 1 {	
+			\$NF += 1;
+			version = \$1;
+			for (i = 2; i <= NF; i++)
+			    version = version \".\" \$i;
+			print version > \"version\";
+			print \"const char vers[] = \\\"\" version \"\\\";\";
+		 }" < version
